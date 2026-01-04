@@ -31,11 +31,15 @@ export default function AdminProducts() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin');
-      return;
-    }
-    fetchProducts();
+    const checkAuth = () => {
+      if (!isAuthenticated()) {
+        router.push('/admin');
+        return;
+      }
+      fetchProducts();
+    };
+    
+    checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

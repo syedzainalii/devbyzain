@@ -111,8 +111,15 @@ export default function Portfolio() {
                       </div>
                     )}
                     
+                    {/* Price Badge */}
+                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full">
+                      <span className="text-2xl font-bold gradient-text">
+                        ${product.price}
+                      </span>
+                    </div>
+                    
                     {product.is_featured && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                         Featured
                       </div>
                     )}
@@ -128,32 +135,28 @@ export default function Portfolio() {
                     
                     <h3 className="text-2xl font-bold mb-3">{product.title}</h3>
                     
-                    <p className="text-gray-400 mb-4 flex-1">
+                    <p className="text-gray-400 mb-6 flex-1">
                       {product.description?.substring(0, 100)}
                       {product.description?.length > 100 ? '...' : ''}
                     </p>
 
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-3xl font-bold gradient-text">
-                        ${product.price}
-                      </span>
-                      
-                      <div className="flex gap-2">
-                        {product.preview_url && (
-                          <Button 
-                            variant="primary" 
-                            icon={<FaExternalLinkAlt />}
-                            onClick={() => window.open(product.preview_url, '_blank')}
-                          >
-                            Preview
-                          </Button>
-                        )}
-                        <Link href={`/templates/${product.id}`}>
-                          <Button variant="secondary" icon={<FaEye />}>
-                            Details
-                          </Button>
-                        </Link>
-                      </div>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+                      {product.preview_url && (
+                        <Button 
+                          variant="ghost" 
+                          icon={<FaExternalLinkAlt />}
+                          onClick={() => window.open(product.preview_url, '_blank')}
+                          className="flex-1"
+                        >
+                          Preview
+                        </Button>
+                      )}
+                      <Link href={`/templates/${product.id}`} className="flex-1">
+                        <Button variant="primary" icon={<FaEye />} className="w-full">
+                          View Details
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </Card>

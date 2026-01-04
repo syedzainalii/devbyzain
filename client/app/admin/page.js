@@ -14,23 +14,33 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Check if user is logged in and is admin
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (!token || !userData) {
-      router.push('/login');
-      return;
-    }
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
 
-    const parsedUser = JSON.parse(userData);
-    if (!parsedUser.is_admin) {
-      router.push('/');
-      return;
-    }
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (!parsedUser.is_admin) {
+          router.push('/');
+          return;
+        }
 
-    setUser(parsedUser);
-    setLoading(false);
-  }, []); // Remove router dependency to prevent unnecessary re-renders
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        router.push('/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []); // Empty dependency array - only run once on mount
 
   const handleLogout = () => {
     localStorage.removeItem('token');

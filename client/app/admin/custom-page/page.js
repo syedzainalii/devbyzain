@@ -28,21 +28,30 @@ export default function EditCustomPage() {
 
   useEffect(() => {
     // Check admin access
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (!token || !userData) {
-      router.push('/login');
-      return;
-    }
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
 
-    const parsedUser = JSON.parse(userData);
-    if (!parsedUser.is_admin) {
-      router.push('/');
-      return;
-    }
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (!parsedUser.is_admin) {
+          router.push('/');
+          return;
+        }
+        
+        loadContent();
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        router.push('/login');
+      }
+    };
 
-    loadContent();
+    checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

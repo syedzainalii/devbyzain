@@ -15,11 +15,15 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin');
-      return;
-    }
-    fetchOrders();
+    const checkAuth = () => {
+      if (!isAuthenticated()) {
+        router.push('/admin');
+        return;
+      }
+      fetchOrders();
+    };
+    
+    checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

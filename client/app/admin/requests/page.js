@@ -14,11 +14,15 @@ export default function AdminRequests() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin');
-      return;
-    }
-    fetchRequests();
+    const checkAuth = () => {
+      if (!isAuthenticated()) {
+        router.push('/admin');
+        return;
+      }
+      fetchRequests();
+    };
+    
+    checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

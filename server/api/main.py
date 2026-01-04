@@ -374,9 +374,13 @@ async def upload_file(
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
+    # For Vercel, return backend API URL to serve files
+    # For local, return static file URL
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+    
     return {
         "filename": unique_filename,
-        "url": f"/uploads/{unique_filename}",
+        "url": f"{backend_url}/api/files/{unique_filename}" if os.environ.get("VERCEL") else f"/uploads/{unique_filename}",
         "size": file.size
     }
 
@@ -666,6 +670,33 @@ async def root():
         "docs": "/docs",
         "health": "/api/health"
     }
+
+
+@app.get("/api/files/{filename}")
+async def get_file(filename: str):
+    """Serve uploaded files from /tmp directory (Vercel compatible)"""
+    from fastapi.responses import FileResponse
+    
+    file_path = upload_path / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Determine content type based on extension
+    content_types = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml',
+        '.pdf': 'application/pdf',
+        '.zip': 'application/zip',
+    }
+    
+    ext = os.path.splitext(filename)[1].lower()
+    media_type = content_types.get(ext, 'application/octet-stream')
+    
+    return FileResponse(file_path, media_type=media_type)
 
 
 if __name__ == "__main__":

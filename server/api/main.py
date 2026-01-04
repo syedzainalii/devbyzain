@@ -48,23 +48,27 @@ def generate_verification_code():
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Create uploads directory
-upload_path = Path(settings.upload_dir)
-upload_path.mkdir(exist_ok=True)
+# Create uploads directory (use /tmp for Vercel)
+upload_path = Path("/tmp") / settings.upload_dir if os.environ.get("VERCEL") else Path(settings.upload_dir)
+upload_path.mkdir(exist_ok=True, parents=True)
 
 app = FastAPI(title="Portfolio & Marketplace API")
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend domain
+    allow_origins=[
+        "https://devbyzain.vercel.app",  # Production frontend
+        "http://localhost:3000",  # Local development
+        "http://localhost:8000",  # Local backend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Serve static files (uploads)
-app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
+# Serve static files (uploads) - disabled for Vercel (use /tmp or cloud storage)
+# app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
 
 
 # Initialize admin on startup
@@ -652,6 +656,16 @@ async def update_page_content(
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "message": "Portfolio & Marketplace API is running"}
+
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Portfolio & Marketplace API",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
 
 
 if __name__ == "__main__":

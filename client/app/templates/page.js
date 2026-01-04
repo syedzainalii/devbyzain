@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaShoppingCart, FaEye } from 'react-icons/fa';
+import { FaShoppingCart, FaEye, FaExternalLinkAlt } from 'react-icons/fa';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
@@ -50,11 +50,10 @@ export default function Portfolio() {
           className="text-center mb-16"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Our <span className="gradient-text">Portfolio</span>
+            Website Templates For Sale
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Explore our collection of stunning pre-made web designs. Each template is crafted with attention
-            to detail and modern best practices.
+          <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto">
+            Browse our collection of professional website designs. Purchase and download instantly to use for your business or project.
           </p>
         </motion.div>
 
@@ -140,9 +139,18 @@ export default function Portfolio() {
                       </span>
                       
                       <div className="flex gap-2">
-                        <Link href={`/portfolio/${product.id}`}>
+                        {product.preview_url && (
+                          <Button 
+                            variant="primary" 
+                            icon={<FaExternalLinkAlt />}
+                            onClick={() => window.open(product.preview_url, '_blank')}
+                          >
+                            Preview
+                          </Button>
+                        )}
+                        <Link href={`/templates/${product.id}`}>
                           <Button variant="secondary" icon={<FaEye />}>
-                            View
+                            Details
                           </Button>
                         </Link>
                       </div>
@@ -167,7 +175,7 @@ export default function Portfolio() {
           <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
             We offer custom design services tailored to your specific needs and brand identity.
           </p>
-          <Link href="/services">
+          <Link href="/custom">
             <Button variant="primary">Request Custom Design</Button>
           </Link>
         </motion.div>

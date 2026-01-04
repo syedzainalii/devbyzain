@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaPlus, FaEdit, FaTrash, FaArrowLeft, FaUpload } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaArrowLeft, FaUpload, FaExternalLinkAlt } from 'react-icons/fa';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import Input, { TextArea } from '@/components/Input';
@@ -24,6 +24,7 @@ export default function AdminProducts() {
     price: '',
     category: '',
     image_url: '',
+    preview_url: '',
     features: '',
     is_featured: false,
     is_available: true,
@@ -35,6 +36,7 @@ export default function AdminProducts() {
       return;
     }
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProducts = async () => {
@@ -98,6 +100,7 @@ export default function AdminProducts() {
       price: product.price.toString(),
       category: product.category || '',
       image_url: product.image_url || '',
+      preview_url: product.preview_url || '',
       features: product.features ? JSON.parse(product.features).join('\n') : '',
       is_featured: product.is_featured,
       is_available: product.is_available,
@@ -124,6 +127,7 @@ export default function AdminProducts() {
       price: '',
       category: '',
       image_url: '',
+      preview_url: '',
       features: '',
       is_featured: false,
       is_available: true,
@@ -206,6 +210,17 @@ export default function AdminProducts() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Preview URL</label>
+                  <Input
+                    type="url"
+                    value={formData.preview_url}
+                    onChange={(e) => setFormData({ ...formData, preview_url: e.target.value })}
+                    placeholder="https://example.com/preview"
+                  />
+                  <p className="text-sm text-gray-400 mt-1">Live demo or preview link for this template</p>
                 </div>
 
                 <div>
@@ -315,6 +330,15 @@ export default function AdminProducts() {
               </div>
 
               <div className="flex gap-2">
+                {product.preview_url && (
+                  <Button 
+                    variant="primary" 
+                    icon={<FaExternalLinkAlt />} 
+                    onClick={() => window.open(product.preview_url, '_blank')}
+                  >
+                    Preview
+                  </Button>
+                )}
                 <Button variant="secondary" icon={<FaEdit />} onClick={() => handleEdit(product)}>
                   Edit
                 </Button>

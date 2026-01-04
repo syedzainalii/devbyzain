@@ -19,6 +19,15 @@ class Settings(BaseSettings):
     upload_dir: str = "uploads"
     max_upload_size: int = 10485760  # 10MB
     
+    # Email Configuration
+    mail_username: str = ""
+    mail_password: str = ""
+    mail_from: str = ""
+    mail_from_name: str = "Portfolio"
+    mail_port: int = 587
+    mail_server: str = "smtp.gmail.com"
+    frontend_url: str = "http://localhost:3000"
+    
     class Config:
         env_file = ".env"
 

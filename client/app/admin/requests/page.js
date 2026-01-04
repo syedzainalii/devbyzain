@@ -19,6 +19,7 @@ export default function AdminRequests() {
       return;
     }
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchRequests = async () => {

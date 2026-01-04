@@ -1,209 +1,195 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaBox, FaShoppingBag, FaEnvelope, FaSignOutAlt } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaBox, FaPaintBrush, FaClipboardList, FaSignOutAlt, FaEdit } from 'react-icons/fa';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import Input from '@/components/Input';
-import Loading from '@/components/Loading';
-import { authAPI } from '@/lib/api';
-import { setToken, getToken, removeToken, isAuthenticated } from '@/lib/auth';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    if (isAuthenticated()) {
-      try {
-        await authAPI.getMe();
-        setIsLoggedIn(true);
-      } catch (error) {
-        removeToken();
-        setIsLoggedIn(false);
-      }
+    // Check if user is logged in and is admin
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      router.push('/login');
+      return;
     }
+
+    const parsedUser = JSON.parse(userData);
+    if (!parsedUser.is_admin) {
+      router.push('/');
+      return;
+    }
+
+    setUser(parsedUser);
     setLoading(false);
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const response = await authAPI.login(loginData);
-      setToken(response.data.access_token);
-      setIsLoggedIn(true);
-    } catch (error) {
-      setError('Invalid email or password');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []); // Remove router dependency to prevent unnecessary re-renders
 
   const handleLogout = () => {
-    removeToken();
-    setIsLoggedIn(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     router.push('/');
   };
 
-  if (loading) return <Loading />;
-
-  // Login Form
-  if (!isLoggedIn) {
+  if (loading) {
     return (
-      <div className="section-padding min-h-screen flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <Card>
-            <h1 className="text-3xl font-bold mb-2 text-center">Admin Login</h1>
-            <p className="text-gray-400 text-center mb-8">
-              Sign in to access the admin dashboard
-            </p>
-
-            {error && (
-              <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-xl mb-6">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Email Address
-                </label>
-                <Input
-                  type="email"
-                  value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  placeholder="admin@example.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Password
-                </label>
-                <Input
-                  type="password"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <Button type="submit" variant="primary" className="w-full">
-                Sign In
-              </Button>
-            </form>
-          </Card>
-        </motion.div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-2xl text-gray-400">Loading...</div>
       </div>
     );
   }
 
-  // Dashboard
   return (
-    <div className="section-padding">
+    <div className="section-padding min-h-screen">
       <div className="container-custom">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-center mb-12"
+          className="mb-12"
         >
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">
-              Admin <span className="gradient-text">Dashboard</span>
-            </h1>
-            <p className="text-gray-400">Manage your portfolio and marketplace</p>
-          </div>
-          <Button variant="secondary" icon={<FaSignOutAlt />} onClick={handleLogout}>
-            Logout
-          </Button>
-        </motion.div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card hover onClick={() => router.push('/admin/products')}>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-2xl">
-                <FaBox />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">Manage Products</h3>
-                <p className="text-gray-400">Add, edit, or delete products</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card hover onClick={() => router.push('/admin/orders')}>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-2xl">
-                <FaShoppingBag />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">View Orders</h3>
-                <p className="text-gray-400">Check customer orders</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card hover onClick={() => router.push('/admin/requests')}>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl flex items-center justify-center text-2xl">
-                <FaEnvelope />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">Custom Requests</h3>
-                <p className="text-gray-400">Review project requests</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Welcome Card */}
-        <Card>
-          <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
-          <p className="text-gray-400 mb-6">
-            Use the cards above to navigate to different sections of the admin panel.
-            You can manage products, view orders, and review custom project requests.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="glass-card p-4 rounded-xl">
-              <h4 className="font-semibold mb-2">Quick Tips</h4>
-              <ul className="text-sm text-gray-400 space-y-1">
-                <li>• Upload high-quality images for better conversions</li>
-                <li>• Keep product descriptions clear and concise</li>
-                <li>• Respond to custom requests within 24 hours</li>
-              </ul>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <h4 className="font-semibold mb-2">Need Help?</h4>
-              <p className="text-sm text-gray-400">
-                Check out the documentation or contact support for assistance with
-                managing your marketplace.
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-5xl font-bold mb-4">
+                Admin <span className="gradient-text">Dashboard</span>
+              </h1>
+              <p className="text-xl text-gray-400">
+                Welcome back, {user?.name || 'Admin'}! Manage your website content here.
               </p>
             </div>
+            <Button variant="secondary" icon={<FaSignOutAlt />} onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
-        </Card>
+        </motion.div>
+
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Manage Templates */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Link href="/admin/products">
+              <Card hover={true} className="h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mb-6">
+                  <FaBox className="text-3xl text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Manage Templates</h3>
+                <p className="text-gray-400 mb-6">
+                  Add, edit, or remove website templates from your shop.
+                </p>
+                <Button variant="ghost" icon={<FaEdit />}>
+                  Go to Templates
+                </Button>
+              </Card>
+            </Link>
+          </motion.div>
+
+          {/* All Orders */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Link href="/admin/orders">
+              <Card hover={true} className="h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-6">
+                  <FaClipboardList className="text-3xl text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">All Orders</h3>
+                <p className="text-gray-400 mb-6">
+                  View and manage template purchase orders.
+                </p>
+                <Button variant="ghost" icon={<FaEdit />}>
+                  View Orders
+                </Button>
+              </Card>
+            </Link>
+          </motion.div>
+
+          {/* Edit Custom Page */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Link href="/admin/custom-page">
+              <Card hover={true} className="h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+                  <FaPaintBrush className="text-3xl text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Edit Custom Page</h3>
+                <p className="text-gray-400 mb-6">
+                  Customize your Custom Design page content.
+                </p>
+                <Button variant="ghost" icon={<FaEdit />}>
+                  Edit Custom Page
+                </Button>
+              </Card>
+            </Link>
+          </motion.div>
+
+          {/* View Custom Requests */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <Link href="/admin/requests">
+              <Card hover={true} className="h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-6">
+                  <FaEdit className="text-3xl text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Custom Requests</h3>
+                <p className="text-gray-400 mb-6">
+                  View and manage custom design requests.
+                </p>
+                <Button variant="ghost" icon={<FaEdit />}>
+                  View Requests
+                </Button>
+              </Card>
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Additional Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-12"
+        >
+          <Card>
+            <h3 className="text-2xl font-bold mb-4">Quick Tips</h3>
+            <ul className="space-y-3 text-gray-400">
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 mt-1">•</span>
+                <span>Use high-quality images (1200x800px recommended) for template previews</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 mt-1">•</span>
+                <span>Update your Custom Design page regularly to reflect new services</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 mt-1">•</span>
+                <span>Respond to custom requests promptly to improve customer satisfaction</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 mt-1">•</span>
+                <span>Admin access is determined by the email set in your .env file</span>
+              </li>
+            </ul>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

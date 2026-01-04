@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Admin
+from models import Admin, User
 from schemas import TokenData
 from config import get_settings
 
@@ -38,6 +38,26 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
+def authenticate_user(db: Session, email: str, password: str):
+    """Authenticate a user (checks both User and Admin tables)"""
+    # First check if user exists in User table
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        if not verify_password(password, user.hashed_password):
+            return False
+        return user
+    
+    # If not in User table, check Admin table for backward compatibility
+    admin = db.query(Admin).filter(Admin.email == email).first()
+    if admin:
+        if not verify_password(password, admin.hashed_password):
+            return False
+        # Return admin as user with is_admin flag
+        return admin
+    
+    return False
+
+
 def authenticate_admin(db: Session, email: str, password: str):
     admin = db.query(Admin).filter(Admin.email == email).first()
     if not admin:
@@ -47,7 +67,8 @@ def authenticate_admin(db: Session, email: str, password: str):
     return admin
 
 
-async def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Get current authenticated user"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -62,10 +83,36 @@ async def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = D
     except JWTError:
         raise credentials_exception
     
+    # Check User table first
+    user = db.query(User).filter(User.email == token_data.email).first()
+    if user:
+        return user
+    
+    # Check Admin table for backward compatibility
     admin = db.query(Admin).filter(Admin.email == token_data.email).first()
-    if admin is None:
-        raise credentials_exception
-    return admin
+    if admin:
+        return admin
+    
+    raise credentials_exception
+
+
+async def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Get current user and verify they are admin"""
+    user = await get_current_user(token, db)
+    
+    # Check if user is admin by email or is_admin flag
+    if isinstance(user, Admin):
+        return user
+    
+    if isinstance(user, User):
+        # Check if user email matches admin email from .env
+        if user.email == settings.admin_email or user.is_admin:
+            return user
+    
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Not authorized. Admin access required."
+    )
 
 
 def init_admin(db: Session):

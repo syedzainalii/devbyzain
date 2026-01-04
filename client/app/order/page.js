@@ -66,6 +66,11 @@ function OrderForm() {
 
       await orderAPI.create(orderData);
       setSuccess(true);
+      
+      // Show contact confirmation message
+      setTimeout(() => {
+        alert('✅ Order placed successfully!\n\n📧 You will receive a confirmation email shortly.\n💬 Our admin will contact you via WhatsApp or Email to complete your order and provide the template files.');
+      }, 500);
     } catch (error) {
       console.error('Error creating order:', error);
       alert('Failed to submit order. Please try again.');
@@ -87,9 +92,13 @@ function OrderForm() {
           >
             <FaCheckCircle className="text-6xl text-green-500 mx-auto mb-6" />
             <h1 className="text-4xl font-bold mb-4">Order Submitted!</h1>
-            <p className="text-xl text-gray-400 mb-8">
-              Thank you for your order. We'll get back to you shortly via email.
+            <p className="text-xl text-gray-400 mb-4">
+              Thank you for your order!
             </p>
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6 mb-8 text-left">
+              <p className="text-lg mb-3"><strong>📧 Check your email</strong> for order confirmation.</p>
+              <p className="text-lg"><strong>💬 Our admin will contact you</strong> via WhatsApp or Email to complete your order and provide the template files.</p>
+            </div>
             <div className="flex gap-4 justify-center">
               <Button variant="primary" onClick={() => router.push('/portfolio')}>
                 Continue Shopping

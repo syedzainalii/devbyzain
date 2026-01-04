@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -9,23 +9,41 @@ import sys
 import shutil
 from pathlib import Path
 import json
+from itsdangerous import URLSafeTimedSerializer
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database import get_db, engine, Base
-from models import Product, Order, CustomRequest, PageContent, Admin
+from models import Product, Order, CustomRequest, PageContent, Admin, User
 import schemas
 from auth import (
-    authenticate_admin, 
+    authenticate_admin,
+    authenticate_user,
     create_access_token, 
-    get_current_admin, 
+    get_current_admin,
+    get_current_user,
     init_admin,
     get_password_hash
 )
 from config import get_settings
+from email_service import (
+    send_verification_code, 
+    send_password_reset_email,
+    send_template_order_email,
+    send_custom_request_email
+)
+import random
+from datetime import timedelta as td
 
 settings = get_settings()
+
+# Token serializer for email verification
+serializer = URLSafeTimedSerializer(settings.secret_key)
+
+def generate_verification_code():
+    """Generate a 6-digit verification code"""
+    return str(random.randint(100000, 999999))
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -59,8 +77,158 @@ async def startup_event():
 
 # ==================== AUTH ENDPOINTS ====================
 
-@app.post("/api/auth/login", response_model=schemas.Token)
-async def login(credentials: schemas.AdminLogin, db: Session = Depends(get_db)):
+@app.post("/api/auth/register")
+async def register(
+    user_data: schemas.UserRegister, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Register a new user - sends verification code"""
+    # Check if user already exists
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Check if email matches admin email from .env
+    is_admin = user_data.email == settings.admin_email
+    
+    # Generate verification code
+    verification_code = generate_verification_code()
+    code_expires_at = datetime.utcnow() + td(minutes=10)
+    
+    # Create new user
+    new_user = User(
+        name=user_data.name,
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        is_admin=is_admin,
+        is_verified=is_admin,  # Auto-verify admin
+        verification_code=verification_code if not is_admin else None,
+        code_expires_at=code_expires_at if not is_admin else None
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    # Send verification code in background (skip for admin)
+    if not is_admin:
+        try:
+            background_tasks.add_task(send_verification_code, new_user.email, verification_code)
+        except Exception as e:
+            print(f"Failed to send verification code: {e}")
+    
+    return {
+        "message": "Registration successful. Please check your email for verification code." if not is_admin else "Admin registered successfully.",
+        "email": new_user.email,
+        "is_admin": is_admin,
+        "requires_verification": not is_admin
+    }
+
+
+@app.post("/api/auth/login")
+async def login(
+    credentials: schemas.UserLogin,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Login for both users and admins - sends verification code if not verified"""
+    user = authenticate_user(db, credentials.email, credentials.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Check if it's a User (not Admin) and needs verification
+    if isinstance(user, User):
+        # If user is not verified and not admin, send verification code
+        if not user.is_verified and not user.is_admin:
+            verification_code = generate_verification_code()
+            code_expires_at = datetime.utcnow() + td(minutes=10)
+            
+            user.verification_code = verification_code
+            user.code_expires_at = code_expires_at
+            db.commit()
+            
+            # Send verification code in background
+            try:
+                background_tasks.add_task(send_verification_code, user.email, verification_code)
+            except Exception as e:
+                print(f"Failed to send verification code: {e}")
+            
+            return {
+                "message": "Please verify your email. Verification code sent to your email.",
+                "email": user.email,
+                "requires_verification": True
+            }
+        
+        # User is verified or admin
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "is_admin": user.is_admin or user.email == settings.admin_email,
+            "is_verified": user.is_verified
+        }
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user_data
+        }
+    
+    # Admin login
+    elif isinstance(user, Admin):
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        
+        user_data = {
+            "id": user.id,
+            "name": "Admin",
+            "email": user.email,
+            "is_admin": True
+        }
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user_data
+        }
+
+
+@app.get("/api/auth/me")
+async def get_me(current_user = Depends(get_current_user)):
+    """Get current user information"""
+    if isinstance(current_user, User):
+        return {
+            "id": current_user.id,
+            "name": current_user.name,
+            "email": current_user.email,
+            "is_admin": current_user.is_admin or current_user.email == settings.admin_email
+        }
+    elif isinstance(current_user, Admin):
+        return {
+            "id": current_user.id,
+            "name": "Admin",
+            "email": current_user.email,
+            "is_admin": True
+        }
+
+
+@app.post("/api/auth/admin-login", response_model=schemas.Token)
+async def admin_login(credentials: schemas.AdminLogin, db: Session = Depends(get_db)):
+    """Admin-only login endpoint (backward compatibility)"""
     admin = authenticate_admin(db, credentials.email, credentials.password)
     if not admin:
         raise HTTPException(
@@ -72,12 +240,114 @@ async def login(credentials: schemas.AdminLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": admin.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": admin.id,
+            "name": "Admin",
+            "email": admin.email,
+            "is_admin": True
+        }
+    }
 
 
-@app.get("/api/auth/me", response_model=schemas.AdminResponse)
-async def get_current_user(current_admin: Admin = Depends(get_current_admin)):
-    return current_admin
+@app.post("/api/auth/verify-code")
+async def verify_code(email: str, code: str, db: Session = Depends(get_db)):
+    """Verify user email with code"""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.is_verified:
+        # Already verified - generate token
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        return {
+            "message": "Email already verified",
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "is_admin": user.is_admin,
+                "is_verified": user.is_verified
+            }
+        }
+    
+    # Check if code matches and is not expired
+    if user.verification_code != code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code"
+        )
+    
+    if user.code_expires_at < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code has expired"
+        )
+    
+    # Mark as verified
+    user.is_verified = True
+    user.verification_code = None
+    user.code_expires_at = None
+    db.commit()
+    
+    # Generate access token
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    
+    return {
+        "message": "Email verified successfully",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "is_admin": user.is_admin,
+            "is_verified": user.is_verified
+        }
+    }
+
+
+@app.post("/api/auth/resend-code")
+async def resend_verification_code(
+    email: str,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Resend verification code"""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.is_verified:
+        return {"message": "Email already verified"}
+    
+    # Generate new code
+    verification_code = generate_verification_code()
+    code_expires_at = datetime.utcnow() + td(minutes=10)
+    
+    user.verification_code = verification_code
+    user.code_expires_at = code_expires_at
+    db.commit()
+    
+    # Send email in background
+    try:
+        background_tasks.add_task(send_verification_code, email, verification_code)
+        return {"message": "Verification code sent"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send verification code"
+        )
 
 
 # ==================== FILE UPLOAD ENDPOINTS ====================
@@ -220,11 +490,32 @@ async def get_order(
 
 
 @app.post("/api/orders", response_model=schemas.Order)
-async def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+async def create_order(
+    order: schemas.OrderCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     db_order = Order(**order.dict())
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+    
+    # Get product details if exists
+    if db_order.product_id:
+        product = db.query(Product).filter(Product.id == db_order.product_id).first()
+        if product:
+            # Send order confirmation email
+            try:
+                background_tasks.add_task(
+                    send_template_order_email,
+                    db_order.customer_email,
+                    db_order.customer_name,
+                    product.title,
+                    db_order.id
+                )
+            except Exception as e:
+                print(f"Failed to send order email: {e}")
+    
     return db_order
 
 
@@ -263,12 +554,26 @@ async def get_custom_requests(
 @app.post("/api/custom-requests", response_model=schemas.CustomRequest)
 async def create_custom_request(
     request: schemas.CustomRequestCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     db_request = CustomRequest(**request.dict())
     db.add(db_request)
     db.commit()
     db.refresh(db_request)
+    
+    # Send custom request confirmation email
+    try:
+        background_tasks.add_task(
+            send_custom_request_email,
+            db_request.customer_email,
+            db_request.customer_name,
+            db_request.project_title,
+            db_request.id
+        )
+    except Exception as e:
+        print(f"Failed to send custom request email: {e}")
+    
     return db_request
 
 

@@ -11,9 +11,11 @@ const api = axios.create({
 
 // Add token to requests if available
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
@@ -21,7 +23,12 @@ api.interceptors.request.use((config) => {
 // Auth APIs
 export const authAPI = {
   login: (credentials) => api.post('/api/auth/login', credentials),
+  register: (userData) => api.post('/api/auth/register', userData),
   getMe: () => api.get('/api/auth/me'),
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
 };
 
 // Product APIs

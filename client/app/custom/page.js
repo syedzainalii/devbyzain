@@ -1,15 +1,51 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaCheckCircle, FaCode, FaPalette, FaRocket, FaMobile, FaSearch, FaCog } from 'react-icons/fa';
 import Button from '@/components/Button';
 import Input, { TextArea } from '@/components/Input';
 import Card from '@/components/Card';
-import { customRequestAPI } from '@/lib/api';
+import { customRequestAPI, contentAPI } from '@/lib/api';
 
 export default function Services() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [pageContent, setPageContent] = useState({
+    hero_title: 'Custom Website Design Services',
+    hero_description: 'Need a custom website built specifically for your business? Fill out the form below and we\'ll create a unique design tailored to your needs.',
+    features: [
+      {
+        icon: 'FaCode',
+        title: 'Modern Technology Stack',
+        description: 'Built with React, Next.js, and the latest web technologies for best performance.',
+      },
+      {
+        icon: 'FaPalette',
+        title: 'Custom Design',
+        description: 'Unique designs tailored to your brand identity and business requirements.',
+      },
+      {
+        icon: 'FaMobile',
+        title: 'Fully Responsive',
+        description: 'Works perfectly on all devices - desktop, tablet, and mobile phones.',
+      },
+      {
+        icon: 'FaRocket',
+        title: 'Fast Delivery',
+        description: 'Quick turnaround time to get your website up and running fast.',
+      },
+      {
+        icon: 'FaSearch',
+        title: 'SEO Ready',
+        description: 'Optimized structure and code for better search engine rankings.',
+      },
+      {
+        icon: 'FaCog',
+        title: 'Easy to Customize',
+        description: 'Clean code that is easy to modify and extend for future needs.',
+      },
+    ]
+  });
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -20,6 +56,33 @@ export default function Services() {
     timeline: '',
     additional_details: '',
   });
+
+  useEffect(() => {
+    loadContent();
+  }, []);
+
+  const loadContent = async () => {
+    try {
+      const response = await contentAPI.getByKey('custom_page');
+      if (response.data) {
+        setPageContent(JSON.parse(response.data.content));
+      }
+    } catch (error) {
+      console.log('Using default content');
+    }
+  };
+
+  const getIcon = (iconName) => {
+    const icons = {
+      FaCode: <FaCode />,
+      FaPalette: <FaPalette />,
+      FaMobile: <FaMobile />,
+      FaRocket: <FaRocket />,
+      FaSearch: <FaSearch />,
+      FaCog: <FaCog />,
+    };
+    return icons[iconName] || <FaCode />;
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -35,6 +98,8 @@ export default function Services() {
     try {
       await customRequestAPI.create(formData);
       setSuccess(true);
+      // Show success message with contact info
+      alert('✅ Request submitted successfully!\n\n📧 You will receive a confirmation email shortly.\n💬 Our admin will contact you via WhatsApp or Email to discuss your project.');
       setFormData({
         customer_name: '',
         customer_email: '',
@@ -53,39 +118,6 @@ export default function Services() {
     }
   };
 
-  const services = [
-    {
-      icon: <FaCode />,
-      title: 'Custom Web Development',
-      description: 'Full-stack web applications built with modern technologies and best practices.',
-    },
-    {
-      icon: <FaPalette />,
-      title: 'UI/UX Design',
-      description: 'Beautiful, intuitive interfaces designed to enhance user experience.',
-    },
-    {
-      icon: <FaMobile />,
-      title: 'Responsive Design',
-      description: 'Websites that look perfect on all devices, from mobile to desktop.',
-    },
-    {
-      icon: <FaRocket />,
-      title: 'Performance Optimization',
-      description: 'Lightning-fast websites optimized for speed and performance.',
-    },
-    {
-      icon: <FaSearch />,
-      title: 'SEO Optimization',
-      description: 'Search engine optimization to improve your online visibility.',
-    },
-    {
-      icon: <FaCog />,
-      title: 'Maintenance & Support',
-      description: 'Ongoing support and maintenance to keep your site running smoothly.',
-    },
-  ];
-
   return (
     <div>
       {/* Hero Section */}
@@ -96,27 +128,62 @@ export default function Services() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Our <span className="gradient-text">Services</span>
+              {pageContent.hero_title}
             </h1>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              We offer comprehensive web development services tailored to your unique needs.
-              From custom designs to full-stack development, we've got you covered.
+            <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-8">
+              {pageContent.hero_description}
+            </p>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              We'll review your requirements and get back to you within 24 hours with a detailed quote and timeline.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Services Grid */}
+      {/* Request Info Section */}
+      <section className="section-padding">
+        <div className="container-custom max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Request Your Custom Website
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Fill out the form below with your project details and we'll send you a quote
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
       <section className="section-padding">
         <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              What You Get
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Every custom website includes these features
+            </p>
+          </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
+            {pageContent.features.map((feature, index) => (
               <Card key={index} delay={index * 0.1}>
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mb-6 text-3xl">
-                  {service.icon}
+                  {getIcon(feature.icon)}
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
-                <p className="text-gray-400">{service.description}</p>
+                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                <p className="text-gray-400 text-lg">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -133,10 +200,10 @@ export default function Services() {
             className="mb-12 text-center"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Request a <span className="gradient-text">Custom Project</span>
+              Get Started
             </h2>
             <p className="text-xl text-gray-400">
-              Tell us about your project and we'll get back to you with a detailed proposal
+              Share your project details and requirements
             </p>
           </motion.div>
 
@@ -236,13 +303,13 @@ export default function Services() {
                     name="budget_range"
                     value={formData.budget_range}
                     onChange={handleChange}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                   >
-                    <option value="">Select a range</option>
-                    <option value="$1,000 - $5,000">$1,000 - $5,000</option>
-                    <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                    <option value="$10,000 - $25,000">$10,000 - $25,000</option>
-                    <option value="$25,000+">$25,000+</option>
+                    <option value="" className="bg-slate-900 text-white">Select a range</option>
+                    <option value="$1,000 - $5,000" className="bg-slate-900 text-white">$1,000 - $5,000</option>
+                    <option value="$5,000 - $10,000" className="bg-slate-900 text-white">$5,000 - $10,000</option>
+                    <option value="$10,000 - $25,000" className="bg-slate-900 text-white">$10,000 - $25,000</option>
+                    <option value="$25,000+" className="bg-slate-900 text-white">$25,000+</option>
                   </select>
                 </div>
 
@@ -254,13 +321,13 @@ export default function Services() {
                     name="timeline"
                     value={formData.timeline}
                     onChange={handleChange}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                   >
-                    <option value="">Select a timeline</option>
-                    <option value="1-2 weeks">1-2 weeks</option>
-                    <option value="3-4 weeks">3-4 weeks</option>
-                    <option value="1-2 months">1-2 months</option>
-                    <option value="3+ months">3+ months</option>
+                    <option value="" className="bg-slate-900 text-white">Select a timeline</option>
+                    <option value="1-2 weeks" className="bg-slate-900 text-white">1-2 weeks</option>
+                    <option value="3-4 weeks" className="bg-slate-900 text-white">3-4 weeks</option>
+                    <option value="1-2 months" className="bg-slate-900 text-white">1-2 months</option>
+                    <option value="3+ months" className="bg-slate-900 text-white">3+ months</option>
                   </select>
                 </div>
               </div>

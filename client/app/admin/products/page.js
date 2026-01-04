@@ -10,6 +10,7 @@ import Loading from '@/components/Loading';
 import { productAPI, uploadAPI } from '@/lib/api';
 import { isAuthenticated } from '@/lib/auth';
 import Image from 'next/image';
+import { normalizeImageUrl } from '@/lib/imageHelper';
 
 export default function AdminProducts() {
   const router = useRouter();
@@ -262,7 +263,7 @@ export default function AdminProducts() {
                     </label>
                     {formData.image_url && (
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                        <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
+                        <Image src={normalizeImageUrl(formData.image_url)} alt="Preview" fill className="object-cover" unoptimized />
                       </div>
                     )}
                   </div>
@@ -317,7 +318,7 @@ export default function AdminProducts() {
             <Card key={product.id}>
               {product.image_url && (
                 <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-                  <Image src={product.image_url} alt={product.title} fill className="object-cover" />
+                  <Image src={normalizeImageUrl(product.image_url)} alt={product.title} fill className="object-cover" unoptimized />
                 </div>
               )}
               

@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    domains: ['localhost', 'devbyzain-backend.vercel.app'],
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'devbyzain-backend.vercel.app',
       },
       {
         protocol: 'https',
@@ -23,7 +28,7 @@ const nextConfig = {
       {
         source: '/uploads/:path*',
         destination: process.env.NEXT_PUBLIC_API_URL 
-          ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/:path*` 
+          ? `${process.env.NEXT_PUBLIC_API_URL}/api/files/:path*` 
           : 'http://localhost:8000/uploads/:path*',
       },
     ];

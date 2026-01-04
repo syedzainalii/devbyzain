@@ -8,6 +8,7 @@ import Card from '@/components/Card';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
 import { productAPI } from '@/lib/api';
+import { normalizeImageUrl } from '@/lib/imageHelper';
 
 export default function Portfolio() {
   const [products, setProducts] = useState([]);
@@ -98,10 +99,11 @@ export default function Portfolio() {
                   <div className="relative w-full h-64 mb-6 rounded-xl overflow-hidden">
                     {product.image_url ? (
                       <Image
-                        src={product.image_url}
+                        src={normalizeImageUrl(product.image_url)}
                         alt={product.title}
                         fill
                         className="object-cover"
+                        unoptimized={!normalizeImageUrl(product.image_url)?.startsWith('https://devbyzain-backend.vercel.app')}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">

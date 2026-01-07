@@ -53,7 +53,9 @@ upload_path = Path("/tmp") / settings.upload_dir if os.environ.get("VERCEL") els
 upload_path.mkdir(exist_ok=True, parents=True)
 
 app = FastAPI(
-    title="Portfolio & Marketplace API",
+    title="DevbyZain API",
+    description="Portfolio & Marketplace API with CORS support",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )

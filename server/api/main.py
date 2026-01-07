@@ -52,7 +52,11 @@ Base.metadata.create_all(bind=engine)
 upload_path = Path("/tmp") / settings.upload_dir if os.environ.get("VERCEL") else Path(settings.upload_dir)
 upload_path.mkdir(exist_ok=True, parents=True)
 
-app = FastAPI(title="Portfolio & Marketplace API")
+app = FastAPI(
+    title="Portfolio & Marketplace API",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
 
 # CORS middleware - Allow all origins for now
 app.add_middleware(
@@ -64,6 +68,27 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,  # Cache preflight requests for 1 hour
 )
+
+# Add middleware to handle OPTIONS requests before authentication
+from fastapi import Request, Response
+
+@app.middleware("http")
+async def cors_preflight_middleware(request: Request, call_next):
+    """Handle OPTIONS requests before they hit route handlers"""
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "false",
+                "Access-Control-Max-Age": "3600",
+            }
+        )
+    
+    response = await call_next(request)
+    return response
 
 # Serve static files (uploads) - disabled for Vercel (use /tmp or cloud storage)
 # app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
@@ -655,10 +680,19 @@ async def update_page_content(
 
 # ==================== CORS PREFLIGHT ====================
 
-@app.options("/{path:path}")
-async def options_handler(path: str):
-    """Handle CORS preflight requests"""
-    return {"status": "ok"}
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Handle CORS preflight requests - must return 200 OK"""
+    from fastapi import Response
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
 
 
 # ==================== HEALTH CHECK ====================

@@ -338,10 +338,10 @@ export default function Services() {
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                       >
                         <option value="" className="bg-slate-900 text-white">Select a range</option>
-                        <option value="Rs 1,00,000 - Rs 5,00,000" className="bg-slate-900 text-white">Rs 1,00,000 - Rs 5,00,000</option>
-                        <option value="Rs 5,00,000 - Rs 10,00,000" className="bg-slate-900 text-white">Rs 5,00,000 - Rs 10,00,000</option>
-                        <option value="Rs 10,00,000 - Rs 25,00,000" className="bg-slate-900 text-white">Rs 10,00,000 - Rs 25,00,000</option>
-                        <option value="Rs 25,00,000+" className="bg-slate-900 text-white">Rs 25,00,000+</option>
+                        <option value="Rs 1,000 - Rs 5,000" className="bg-slate-900 text-white">Basic Tier - Rs 1,000 - Rs 5,000</option>
+                        <option value="Rs 5,000 - Rs 10,000" className="bg-slate-900 text-white">Standard Tier - Rs 5,000 - Rs 10,000</option>
+                        <option value="Rs 10,000 - Rs 25,000" className="bg-slate-900 text-white">Advance Tier - Rs 10,000 - Rs 25,000</option>
+                        <option value="Rs 25,000+" className="bg-slate-900 text-white">Premium Tier - Rs 25,000+</option>
                       </select>
                     </div>
 

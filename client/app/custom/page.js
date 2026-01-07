@@ -356,10 +356,10 @@ export default function Services() {
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                       >
                         <option value="" className="bg-slate-900 text-white">Select a timeline</option>
-                        <option value="1-2 weeks" className="bg-slate-900 text-white">1-2 weeks</option>
-                        <option value="3-4 weeks" className="bg-slate-900 text-white">3-4 weeks</option>
-                        <option value="1-2 months" className="bg-slate-900 text-white">1-2 months</option>
-                        <option value="3+ months" className="bg-slate-900 text-white">3+ months</option>
+                        <option value="1-2 weeks" className="bg-slate-900 text-white">1-2 days</option>
+                        <option value="3-4 weeks" className="bg-slate-900 text-white">3-4 days</option>
+                        <option value="1-2 months" className="bg-slate-900 text-white">5-7 days</option>
+                        <option value="3+ months" className="bg-slate-900 text-white">1+ weeks</option>
                       </select>
                     </div>
                   </div>

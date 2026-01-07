@@ -4,7 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = "sqlite:///./portfolio.db"
+    database_url: str = "postgresql://localhost/devbyzain"
     
     # Admin
     admin_email: str = "admin@example.com"
@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     mail_port: int = 587
     mail_server: str = "smtp.gmail.com"
     frontend_url: str = "http://localhost:3000"
+    backend_url: str = "http://localhost:8000"
     
     class Config:
         env_file = ".env"

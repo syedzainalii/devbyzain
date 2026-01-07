@@ -31,9 +31,9 @@ export default function AdminProducts() {
     is_featured: false,
     is_available: true,
     tier_system: {
-      basic: { price: '', services: [], delivery_time: '' },
-      standard: { price: '', services: [], delivery_time: '' },
-      premium: { price: '', services: [], delivery_time: '' }
+      basic: { price: '', services: [], delivery_time: '', description: '' },
+      standard: { price: '', services: [], delivery_time: '', description: '' },
+      premium: { price: '', services: [], delivery_time: '', description: '' }
     }
   });
 
@@ -132,9 +132,9 @@ export default function AdminProducts() {
     setEditingProduct(product);
     
     let tierSystem = {
-      basic: { price: '', services: [], delivery_time: '' },
-      standard: { price: '', services: [], delivery_time: '' },
-      premium: { price: '', services: [], delivery_time: '' }
+      basic: { price: '', services: [], delivery_time: '', description: '' },
+      standard: { price: '', services: [], delivery_time: '', description: '' },
+      premium: { price: '', services: [], delivery_time: '', description: '' }
     };
     
     if (product.tier_system) {
@@ -144,7 +144,9 @@ export default function AdminProducts() {
         ['basic', 'standard', 'premium'].forEach(tier => {
           if (parsed[tier]) {
             tierSystem[tier] = {
-              ...parsed[tier],
+              price: parsed[tier].price || '',
+              delivery_time: parsed[tier].delivery_time || '',
+              description: parsed[tier].description || '',
               services: Array.isArray(parsed[tier].services) 
                 ? parsed[tier].services 
                 : (parsed[tier].services ? [parsed[tier].services] : [])
@@ -207,9 +209,9 @@ export default function AdminProducts() {
       is_featured: false,
       is_available: true,
       tier_system: {
-        basic: { price: '', services: '', delivery_time: '' },
-        standard: { price: '', services: '', delivery_time: '' },
-        premium: { price: '', services: '', delivery_time: '' }
+        basic: { price: '', services: [], delivery_time: '', description: '' },
+        standard: { price: '', services: [], delivery_time: '', description: '' },
+        premium: { price: '', services: [], delivery_time: '', description: '' }
       }
     });
     setAdditionalImages([]);
@@ -268,15 +270,6 @@ export default function AdminProducts() {
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="e.g., E-commerce, Portfolio, Landing Page"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Description</label>
-                  <TextArea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
                   />
                 </div>
 
@@ -414,6 +407,23 @@ export default function AdminProducts() {
                               placeholder="3-5 days"
                             />
                           </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Description</label>
+                          <textarea
+                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            rows={3}
+                            value={formData.tier_system[tier].description || ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              tier_system: {
+                                ...formData.tier_system,
+                                [tier]: { ...formData.tier_system[tier], description: e.target.value }
+                              }
+                            })}
+                            placeholder="Describe this tier..."
+                          />
                         </div>
                         
                         <div>

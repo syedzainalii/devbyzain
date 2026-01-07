@@ -207,9 +207,11 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-              {product.description}
-            </p>
+            {tierSystem && selectedTier && tierSystem[selectedTier]?.description && (
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                {tierSystem[selectedTier].description}
+              </p>
+            )}
 
             {/* Features */}
             {features.length > 0 && (

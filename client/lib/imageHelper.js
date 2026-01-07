@@ -49,6 +49,12 @@ export function normalizeImageUrl(imageUrl) {
   return imageUrl;
 }
 
+// Helper to handle image load errors
+export function handleImageError(e) {
+  console.error('Image failed to load:', e.target.src);
+  e.target.style.display = 'none';
+}
+
 /**
  * Check if an image URL is external (needs to be in Next.js domains config)
  */

@@ -46,7 +46,10 @@ def generate_verification_code():
     return str(random.randint(100000, 999999))
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables on startup: {e}")
 
 # Create uploads directory (use /tmp for Vercel)
 upload_path = Path("/tmp") / settings.upload_dir if os.environ.get("VERCEL") else Path(settings.upload_dir)
@@ -99,9 +102,12 @@ async def cors_preflight_middleware(request: Request, call_next):
 # Initialize admin on startup
 @app.on_event("startup")
 async def startup_event():
-    db = next(get_db())
-    init_admin(db)
-    db.close()
+    try:
+        db = next(get_db())
+        init_admin(db)
+        db.close()
+    except Exception as e:
+        print(f"Warning: Could not initialize admin on startup: {e}")
 
 
 # ==================== AUTH ENDPOINTS ====================

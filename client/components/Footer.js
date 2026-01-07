@@ -154,7 +154,7 @@ export default function Footer() {
                     <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/30 transition-all flex-shrink-0 mt-0.5">
                       <FaEnvelope className="text-sm" />
                     </div>
-                    <span className="break-all">contact@devbyzain.com</span>
+                    <span className="break-all">syedzainali4372@gmail.com</span>
                   </a>
                 </li>
                 <li>

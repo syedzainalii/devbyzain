@@ -149,60 +149,147 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Pricing Tiers Section */}
+      {/* Custom Request Form with Tier Selection */}
       <section className="section-padding">
-        <div className="container-custom">
+        <div className="container-custom max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="mb-12 text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Choose Your <span className="gradient-text">Package</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Start Your Project
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Select the package that best fits your needs and budget
+            <p className="text-xl text-gray-400">
+              Fill out the form and choose your preferred package
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-            {['basic', 'standard', 'premium'].map((tier, index) => (
-              <motion.div
-                key={tier}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card 
-                  hover={true}
-                  className={`h-full cursor-pointer transition-all ${
-                    selectedTier === tier ? 'ring-2 ring-purple-500 scale-105' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedTier(tier);
-                    setFormData({ ...formData, selected_tier: tier });
-                  }}
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${
-                    tier === 'basic' ? 'from-blue-500 to-cyan-500' :
-                    tier === 'standard' ? 'from-indigo-500 to-purple-500' :
-                    'from-purple-500 to-pink-500'
-                  } rounded-xl flex items-center justify-center mb-6 text-3xl`}>
-                    {tier === 'basic' ? '🌟' : tier === 'standard' ? '🚀' : '💎'}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass-card p-8 text-center mb-8"
+            >
+              <FaCheckCircle className="text-5xl text-green-500 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold mb-2">Request Submitted!</h3>
+              <p className="text-gray-400">
+                We'll review your project details and get back to you within 24 hours.
+              </p>
+            </motion.div>
+          )}
+
+          <Card>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Personal Information */}
+              <div>
+                <h3 className="text-2xl font-bold mb-4 text-purple-400">Contact Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Full Name *
+                    </label>
+                    <Input
+                      name="customer_name"
+                      placeholder="John Doe"
+                      value={formData.customer_name}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
-                  <h3 className="text-3xl font-bold mb-2 capitalize">{tier}</h3>
-                  <div className="text-5xl font-bold gradient-text mb-4">
-                    Rs {pageContent.tier_system[tier].price}
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Email Address *
+                    </label>
+                    <Input
+                      type="email"
+                      name="customer_email"
+                      placeholder="john@example.com"
+                      value={formData.customer_email}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
-                  <p className="text-gray-400 mb-4">
-                    ⏱️ {pageContent.tier_system[tier].delivery_time}
-                  </p>
-                  <div className="mb-6 p-4 bg-white/5 rounded-lg">
-                    <h4 className="font-semibold mb-2 text-purple-400">Includes:</h4>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Phone Number
+                    </label>
+                    <Input
+                      type="tel"
+                      name="customer_phone"
+                      placeholder="+91 98765 43210"
+                      value={formData.customer_phone}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Project Title *
+                    </label>
+                    <Input
+                      name="project_title"
+                      placeholder="My Awesome Project"
+                      value={formData.project_title}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Package Selection */}
+              <div>
+                <h3 className="text-2xl font-bold mb-4 text-purple-400">Choose Your Package</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {['basic', 'standard', 'premium'].map((tier) => (
+                    <button
+                      key={tier}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTier(tier);
+                        setFormData({ ...formData, selected_tier: tier });
+                      }}
+                      className={`p-6 rounded-xl border-2 transition-all text-left ${
+                        selectedTier === tier
+                          ? 'border-purple-500 bg-purple-500/20 scale-105'
+                          : 'border-white/10 bg-white/5 hover:border-purple-400'
+                      }`}
+                    >
+                      <div className={`w-12 h-12 bg-gradient-to-br ${
+                        tier === 'basic' ? 'from-blue-500 to-cyan-500' :
+                        tier === 'standard' ? 'from-indigo-500 to-purple-500' :
+                        'from-purple-500 to-pink-500'
+                      } rounded-lg flex items-center justify-center mb-4 text-2xl`}>
+                        {tier === 'basic' ? '🌟' : tier === 'standard' ? '🚀' : '💎'}
+                      </div>
+                      <h4 className="text-xl font-bold capitalize mb-2">{tier}</h4>
+                      <p className="text-3xl font-bold gradient-text mb-2">
+                        Rs {pageContent.tier_system[tier].price}
+                      </p>
+                      <p className="text-sm text-gray-400 mb-3">
+                        ⏱️ {pageContent.tier_system[tier].delivery_time}
+                      </p>
+                      {selectedTier === tier && (
+                        <div className="mt-3">
+                          <span className="inline-block bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            ✓ Selected
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Show selected tier details */}
+                {selectedTier && (
+                  <div className="mt-6 p-4 bg-white/5 rounded-lg">
+                    <h4 className="font-semibold mb-2 text-purple-400">Package Includes:</h4>
                     {(() => {
-                      const services = pageContent.tier_system[tier].services;
+                      const services = pageContent.tier_system[selectedTier].services;
                       if (Array.isArray(services)) {
                         return (
                           <ul className="space-y-2">
@@ -215,24 +302,93 @@ export default function Services() {
                           </ul>
                         );
                       }
-                      return (
-                        <p className="text-gray-300 text-sm leading-relaxed">
-                          {services}
-                        </p>
-                      );
+                      return <p className="text-gray-300 text-sm">{services}</p>;
                     })()}
                   </div>
-                  {selectedTier === tier && (
-                    <div className="mt-4 text-center">
-                      <span className="inline-block bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                        ✓ Selected
-                      </span>
+                )}
+              </div>
+
+              {/* Project Details */}
+              <div>
+                <h3 className="text-2xl font-bold mb-4 text-purple-400">Project Details</h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Project Scope *
+                    </label>
+                    <TextArea
+                      name="project_scope"
+                      placeholder="Describe your project requirements, features, and goals..."
+                      value={formData.project_scope}
+                      onChange={handleChange}
+                      rows={6}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Budget Range
+                      </label>
+                      <select
+                        name="budget_range"
+                        value={formData.budget_range}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+                      >
+                        <option value="" className="bg-slate-900 text-white">Select a range</option>
+                        <option value="Rs 1,00,000 - Rs 5,00,000" className="bg-slate-900 text-white">Rs 1,00,000 - Rs 5,00,000</option>
+                        <option value="Rs 5,00,000 - Rs 10,00,000" className="bg-slate-900 text-white">Rs 5,00,000 - Rs 10,00,000</option>
+                        <option value="Rs 10,00,000 - Rs 25,00,000" className="bg-slate-900 text-white">Rs 10,00,000 - Rs 25,00,000</option>
+                        <option value="Rs 25,00,000+" className="bg-slate-900 text-white">Rs 25,00,000+</option>
+                      </select>
                     </div>
-                  )}
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Expected Timeline
+                      </label>
+                      <select
+                        name="timeline"
+                        value={formData.timeline}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+                      >
+                        <option value="" className="bg-slate-900 text-white">Select a timeline</option>
+                        <option value="1-2 weeks" className="bg-slate-900 text-white">1-2 weeks</option>
+                        <option value="3-4 weeks" className="bg-slate-900 text-white">3-4 weeks</option>
+                        <option value="1-2 months" className="bg-slate-900 text-white">1-2 months</option>
+                        <option value="3+ months" className="bg-slate-900 text-white">3+ months</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Additional Details
+                    </label>
+                    <TextArea
+                      name="additional_details"
+                      placeholder="Any other information you'd like to share..."
+                      value={formData.additional_details}
+                      onChange={handleChange}
+                      rows={4}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full"
+                disabled={submitting}
+              >
+                {submitting ? 'Submitting...' : 'Submit Project Request'}
+              </Button>
+            </form>
+          </Card>
         </div>
       </section>
 
@@ -267,173 +423,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Custom Request Form */}
-      <section className="section-padding">
-        <div className="container-custom max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 text-center"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Get Started
-            </h2>
-            <p className="text-xl text-gray-400">
-              Share your project details and requirements
-            </p>
-          </motion.div>
-
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="glass-card p-8 text-center mb-8"
-            >
-              <FaCheckCircle className="text-5xl text-green-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">Request Submitted!</h3>
-              <p className="text-gray-400">
-                We'll review your project details and get back to you within 24 hours.
-              </p>
-            </motion.div>
-          )}
-
-          <Card>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Full Name *
-                  </label>
-                  <Input
-                    name="customer_name"
-                    placeholder="John Doe"
-                    value={formData.customer_name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Email Address *
-                  </label>
-                  <Input
-                    type="email"
-                    name="customer_email"
-                    placeholder="john@example.com"
-                    value={formData.customer_email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Phone Number
-                  </label>
-                  <Input
-                    type="tel"
-                    name="customer_phone"
-                    placeholder="+1 (555) 123-4567"
-                    value={formData.customer_phone}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Project Title *
-                  </label>
-                  <Input
-                    name="project_title"
-                    placeholder="My Awesome Project"
-                    value={formData.project_title}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Project Scope *
-                </label>
-                <TextArea
-                  name="project_scope"
-                  placeholder="Describe your project requirements, features, and goals..."
-                  value={formData.project_scope}
-                  onChange={handleChange}
-                  rows={6}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Budget Range
-                  </label>
-                  <select
-                    name="budget_range"
-                    value={formData.budget_range}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
-                  >
-                    <option value="" className="bg-slate-900 text-white">Select a range</option>
-                    <option value="Rs 1,00,000 - Rs 5,00,000" className="bg-slate-900 text-white">Rs 1,00,000 - Rs 5,00,000</option>
-                    <option value="Rs 5,00,000 - Rs 10,00,000" className="bg-slate-900 text-white">Rs 5,00,000 - Rs 10,00,000</option>
-                    <option value="Rs 10,00,000 - Rs 25,00,000" className="bg-slate-900 text-white">Rs 10,00,000 - Rs 25,00,000</option>
-                    <option value="Rs 25,00,000+" className="bg-slate-900 text-white">Rs 25,00,000+</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Expected Timeline
-                  </label>
-                  <select
-                    name="timeline"
-                    value={formData.timeline}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
-                  >
-                    <option value="" className="bg-slate-900 text-white">Select a timeline</option>
-                    <option value="1-2 weeks" className="bg-slate-900 text-white">1-2 weeks</option>
-                    <option value="3-4 weeks" className="bg-slate-900 text-white">3-4 weeks</option>
-                    <option value="1-2 months" className="bg-slate-900 text-white">1-2 months</option>
-                    <option value="3+ months" className="bg-slate-900 text-white">3+ months</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Additional Details
-                </label>
-                <TextArea
-                  name="additional_details"
-                  placeholder="Any other information you'd like to share..."
-                  value={formData.additional_details}
-                  onChange={handleChange}
-                  rows={4}
-                />
-              </div>
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full"
-                disabled={submitting}
-              >
-                {submitting ? 'Submitting...' : 'Submit Request'}
-              </Button>
-            </form>
-          </Card>
-        </div>
-      </section>
     </div>
   );
 }

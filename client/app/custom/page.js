@@ -201,9 +201,26 @@ export default function Services() {
                   </p>
                   <div className="mb-6 p-4 bg-white/5 rounded-lg">
                     <h4 className="font-semibold mb-2 text-purple-400">Includes:</h4>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {pageContent.tier_system[tier].services}
-                    </p>
+                    {(() => {
+                      const services = pageContent.tier_system[tier].services;
+                      if (Array.isArray(services)) {
+                        return (
+                          <ul className="space-y-2">
+                            {services.map((service, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-gray-300 text-sm">
+                                <span className="text-purple-400 mt-0.5">✓</span>
+                                <span>{service}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      return (
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          {services}
+                        </p>
+                      );
+                    })()}
                   </div>
                   {selectedTier === tier && (
                     <div className="mt-4 text-center">

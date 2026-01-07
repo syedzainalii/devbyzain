@@ -31,9 +31,9 @@ export default function AdminProducts() {
     is_featured: false,
     is_available: true,
     tier_system: {
-      basic: { price: '', services: '', delivery_time: '' },
-      standard: { price: '', services: '', delivery_time: '' },
-      premium: { price: '', services: '', delivery_time: '' }
+      basic: { price: '', services: [], delivery_time: '' },
+      standard: { price: '', services: [], delivery_time: '' },
+      premium: { price: '', services: [], delivery_time: '' }
     }
   });
 
@@ -132,14 +132,25 @@ export default function AdminProducts() {
     setEditingProduct(product);
     
     let tierSystem = {
-      basic: { price: '', services: '', delivery_time: '' },
-      standard: { price: '', services: '', delivery_time: '' },
-      premium: { price: '', services: '', delivery_time: '' }
+      basic: { price: '', services: [], delivery_time: '' },
+      standard: { price: '', services: [], delivery_time: '' },
+      premium: { price: '', services: [], delivery_time: '' }
     };
     
     if (product.tier_system) {
       try {
-        tierSystem = JSON.parse(product.tier_system);
+        const parsed = JSON.parse(product.tier_system);
+        // Convert old string format to array format if needed
+        ['basic', 'standard', 'premium'].forEach(tier => {
+          if (parsed[tier]) {
+            tierSystem[tier] = {
+              ...parsed[tier],
+              services: Array.isArray(parsed[tier].services) 
+                ? parsed[tier].services 
+                : (parsed[tier].services ? [parsed[tier].services] : [])
+            };
+          }
+        });
       } catch (e) {
         console.error('Error parsing tier_system:', e);
       }
@@ -371,50 +382,98 @@ export default function AdminProducts() {
                   {['basic', 'standard', 'premium'].map((tier) => (
                     <div key={tier} className="p-4 bg-white/5 rounded-lg border border-white/10">
                       <h4 className="text-lg font-semibold capitalize mb-4 text-purple-400">{tier} Tier</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">Price ($)</label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={formData.tier_system[tier].price}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              tier_system: {
-                                ...formData.tier_system,
-                                [tier]: { ...formData.tier_system[tier], price: e.target.value }
-                              }
-                            })}
-                            placeholder="99.00"
-                          />
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold mb-2">Price ($)</label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={formData.tier_system[tier].price}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                tier_system: {
+                                  ...formData.tier_system,
+                                  [tier]: { ...formData.tier_system[tier], price: e.target.value }
+                                }
+                              })}
+                              placeholder="99.00"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold mb-2">Delivery Time</label>
+                            <Input
+                              value={formData.tier_system[tier].delivery_time}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                tier_system: {
+                                  ...formData.tier_system,
+                                  [tier]: { ...formData.tier_system[tier], delivery_time: e.target.value }
+                                }
+                              })}
+                              placeholder="3-5 days"
+                            />
+                          </div>
                         </div>
+                        
                         <div>
-                          <label className="block text-sm font-semibold mb-2">Services Included</label>
-                          <Input
-                            value={formData.tier_system[tier].services}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              tier_system: {
-                                ...formData.tier_system,
-                                [tier]: { ...formData.tier_system[tier], services: e.target.value }
-                              }
-                            })}
-                            placeholder="Basic setup, 3 pages"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">Delivery Time</label>
-                          <Input
-                            value={formData.tier_system[tier].delivery_time}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              tier_system: {
-                                ...formData.tier_system,
-                                [tier]: { ...formData.tier_system[tier], delivery_time: e.target.value }
-                              }
-                            })}
-                            placeholder="3-5 days"
-                          />
+                          <label className="block text-sm font-semibold mb-2">What's Included</label>
+                          <div className="space-y-2">
+                            {(formData.tier_system[tier].services || []).map((service, index) => (
+                              <div key={index} className="flex gap-2">
+                                <Input
+                                  value={service}
+                                  onChange={(e) => {
+                                    const newServices = [...formData.tier_system[tier].services];
+                                    newServices[index] = e.target.value;
+                                    setFormData({
+                                      ...formData,
+                                      tier_system: {
+                                        ...formData.tier_system,
+                                        [tier]: { ...formData.tier_system[tier], services: newServices }
+                                      }
+                                    });
+                                  }}
+                                  placeholder="e.g., Responsive design"
+                                  className="flex-1"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newServices = formData.tier_system[tier].services.filter((_, i) => i !== index);
+                                    setFormData({
+                                      ...formData,
+                                      tier_system: {
+                                        ...formData.tier_system,
+                                        [tier]: { ...formData.tier_system[tier], services: newServices }
+                                      }
+                                    });
+                                  }}
+                                  className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                                >
+                                  <FaTrash className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              icon={<FaPlus />}
+                              onClick={() => {
+                                const newServices = [...(formData.tier_system[tier].services || []), ''];
+                                setFormData({
+                                  ...formData,
+                                  tier_system: {
+                                    ...formData.tier_system,
+                                    [tier]: { ...formData.tier_system[tier], services: newServices }
+                                  }
+                                });
+                              }}
+                              className="w-full"
+                            >
+                              Add Item
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>

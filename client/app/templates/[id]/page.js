@@ -185,7 +185,18 @@ export default function ProductDetail() {
                   {tierSystem[selectedTier]?.services && (
                     <div className="mt-4 p-4 bg-white/5 rounded-lg">
                       <h4 className="font-semibold mb-2">What's Included:</h4>
-                      <p className="text-gray-300">{tierSystem[selectedTier].services}</p>
+                      {Array.isArray(tierSystem[selectedTier].services) ? (
+                        <ul className="space-y-2">
+                          {tierSystem[selectedTier].services.map((service, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-gray-300">
+                              <span className="text-purple-400 mt-1">✓</span>
+                              <span>{service}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-300">{tierSystem[selectedTier].services}</p>
+                      )}
                     </div>
                   )}
                 </Card>

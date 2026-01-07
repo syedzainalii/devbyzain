@@ -14,17 +14,24 @@ export function normalizeImageUrl(imageUrl) {
   }
 
   // Determine the API URL based on environment
-  // Check if we're in production by looking at the hostname
-  let apiUrl = 'http://localhost:8000'; // Default for development
+  let apiUrl;
   
-  if (typeof window !== 'undefined') {
-    // In browser - check the hostname
-    if (window.location.hostname.includes('vercel.app') || window.location.hostname === 'devbyzain.vercel.app') {
-      apiUrl = 'https://devbyzain-backend.vercel.app';
-    }
-  } else if (process.env.NEXT_PUBLIC_API_URL) {
-    // Server-side or env variable set
+  // Priority 1: Use environment variable if set
+  if (process.env.NEXT_PUBLIC_API_URL) {
     apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
+  // Priority 2: Detect production by hostname (client-side)
+  else if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('vercel.app') || hostname === 'devbyzain.vercel.app' || hostname === 'devbyzain.com') {
+      apiUrl = 'https://devbyzain-backend.vercel.app';
+    } else {
+      apiUrl = 'http://localhost:8000';
+    }
+  }
+  // Priority 3: Default to localhost for development
+  else {
+    apiUrl = 'http://localhost:8000';
   }
 
   // If it's in the old /uploads/ format, convert to new format

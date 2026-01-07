@@ -170,7 +170,15 @@ async def login(
     db: Session = Depends(get_db)
 ):
     """Login for both users and admins - sends verification code if not verified"""
-    user = authenticate_user(db, credentials.email, credentials.password)
+    try:
+        user = authenticate_user(db, credentials.email, credentials.password)
+    except Exception as e:
+        print(f"Error during authentication: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Authentication error: {str(e)}"
+        )
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

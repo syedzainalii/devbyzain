@@ -378,7 +378,7 @@ export default function AdminProducts() {
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-semibold mb-2">Price ($)</label>
+                            <label className="block text-sm font-semibold mb-2">Price (Rs)</label>
                             <Input
                               type="number"
                               step="0.01"
@@ -390,7 +390,7 @@ export default function AdminProducts() {
                                   [tier]: { ...formData.tier_system[tier], price: e.target.value }
                                 }
                               })}
-                              placeholder="99.00"
+                              placeholder="9900.00"
                             />
                           </div>
                           <div>
@@ -547,7 +547,7 @@ export default function AdminProducts() {
               <p className="text-gray-400 mb-4 line-clamp-2">{product.description}</p>
               
               <div className="flex justify-between items-center mb-4">
-                <span className="text-2xl font-bold gradient-text">${product.price}</span>
+                <span className="text-2xl font-bold gradient-text">Rs {product.price}</span>
                 {product.is_featured && (
                   <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">
                     Featured

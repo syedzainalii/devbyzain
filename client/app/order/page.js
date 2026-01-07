@@ -225,7 +225,7 @@ function OrderForm() {
                     <div className="flex justify-between items-center">
                       <span className="text-xl font-semibold">Total</span>
                       <span className="text-3xl font-bold gradient-text">
-                        ${product.price}
+                        Rs {product.price}
                       </span>
                     </div>
                   </div>

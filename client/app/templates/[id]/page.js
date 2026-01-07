@@ -108,7 +108,7 @@ export default function ProductDetail() {
 
             {/* Thumbnail Images */}
             {allImages.length > 1 && (
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid grid-cols-5 gap-4 mb-6">
                 {allImages.map((img, index) => (
                   <div
                     key={index}
@@ -125,6 +125,41 @@ export default function ProductDetail() {
                     />
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Action Buttons - Moved under images */}
+            {product.is_available ? (
+              <div className="space-y-3">
+                {product.preview_url && (
+                  <button
+                    onClick={() => window.open(product.preview_url, '_blank')}
+                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50"
+                  >
+                    <FaExternalLinkAlt />
+                    View Live Preview
+                  </button>
+                )}
+                
+                <Link href={`/order?product=${product.id}&type=purchase`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50">
+                    <FaShoppingCart />
+                    Buy Now - Rs {tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
+                  </button>
+                </Link>
+                
+                <Link href={`/order?product=${product.id}&type=customization`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] border border-white/20 hover:border-white/30">
+                    <FaEdit />
+                    Request Customization
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <div className="glass-card p-6 text-center">
+                <p className="text-xl text-gray-400">
+                  This product is currently unavailable
+                </p>
               </div>
             )}
           </motion.div>
@@ -171,7 +206,7 @@ export default function ProductDetail() {
                         >
                           <h4 className="text-lg font-bold capitalize mb-2">{tier}</h4>
                           <p className="text-3xl font-bold gradient-text mb-2">
-                            ${tierSystem[tier].price}
+                            Rs {tierSystem[tier].price}
                           </p>
                           {tierSystem[tier].delivery_time && (
                             <p className="text-sm text-gray-400">
@@ -226,41 +261,6 @@ export default function ProductDetail() {
                   ))}
                 </ul>
               </Card>
-            )}
-
-            {/* Action Buttons */}
-            {product.is_available ? (
-              <div className="space-y-3">
-                {product.preview_url && (
-                  <button
-                    onClick={() => window.open(product.preview_url, '_blank')}
-                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50"
-                  >
-                    <FaExternalLinkAlt />
-                    View Live Preview
-                  </button>
-                )}
-                
-                <Link href={`/order?product=${product.id}&type=purchase`} className="block">
-                  <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50">
-                    <FaShoppingCart />
-                    Buy Now - ${tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
-                  </button>
-                </Link>
-                
-                <Link href={`/order?product=${product.id}&type=customization`} className="block">
-                  <button className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] border border-white/20 hover:border-white/30">
-                    <FaEdit />
-                    Request Customization
-                  </button>
-                </Link>
-              </div>
-            ) : (
-              <div className="glass-card p-6 text-center">
-                <p className="text-xl text-gray-400">
-                  This product is currently unavailable
-                </p>
-              </div>
             )}
           </motion.div>
         </div>

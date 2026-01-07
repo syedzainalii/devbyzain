@@ -191,7 +191,7 @@ export default function Templates() {
                           if (basicPrice) {
                             return (
                               <span className="text-xl font-bold gradient-text">
-                                From ${basicPrice}
+                                From Rs {basicPrice}
                               </span>
                             );
                           }
@@ -200,7 +200,7 @@ export default function Templates() {
                         }
                         return (
                           <span className="text-2xl font-bold gradient-text">
-                            ${product.price}
+                            Rs {product.price}
                           </span>
                         );
                       })()}

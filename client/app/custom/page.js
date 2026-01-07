@@ -194,7 +194,7 @@ export default function Services() {
                   </div>
                   <h3 className="text-3xl font-bold mb-2 capitalize">{tier}</h3>
                   <div className="text-5xl font-bold gradient-text mb-4">
-                    ${pageContent.tier_system[tier].price}
+                    Rs {pageContent.tier_system[tier].price}
                   </div>
                   <p className="text-gray-400 mb-4">
                     ⏱️ {pageContent.tier_system[tier].delivery_time}
@@ -383,10 +383,10 @@ export default function Services() {
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                   >
                     <option value="" className="bg-slate-900 text-white">Select a range</option>
-                    <option value="$1,000 - $5,000" className="bg-slate-900 text-white">$1,000 - $5,000</option>
-                    <option value="$5,000 - $10,000" className="bg-slate-900 text-white">$5,000 - $10,000</option>
-                    <option value="$10,000 - $25,000" className="bg-slate-900 text-white">$10,000 - $25,000</option>
-                    <option value="$25,000+" className="bg-slate-900 text-white">$25,000+</option>
+                    <option value="Rs 1,00,000 - Rs 5,00,000" className="bg-slate-900 text-white">Rs 1,00,000 - Rs 5,00,000</option>
+                    <option value="Rs 5,00,000 - Rs 10,00,000" className="bg-slate-900 text-white">Rs 5,00,000 - Rs 10,00,000</option>
+                    <option value="Rs 10,00,000 - Rs 25,00,000" className="bg-slate-900 text-white">Rs 10,00,000 - Rs 25,00,000</option>
+                    <option value="Rs 25,00,000+" className="bg-slate-900 text-white">Rs 25,00,000+</option>
                   </select>
                 </div>
 

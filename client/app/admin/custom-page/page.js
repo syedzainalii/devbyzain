@@ -217,7 +217,7 @@ export default function EditCustomPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold mb-2 text-gray-300">
-                      Price ($)
+                      Price (Rs)
                     </label>
                     <Input
                       type="number"

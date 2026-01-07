@@ -54,17 +54,20 @@ upload_path.mkdir(exist_ok=True, parents=True)
 
 app = FastAPI(title="Portfolio & Marketplace API")
 
-# CORS middleware
+# CORS middleware - Allow requests from frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://devbyzain.vercel.app",  # Production frontend
+        "https://devbyzain-git-main-your-username.vercel.app",  # Vercel preview deployments
         "http://localhost:3000",  # Local development
         "http://localhost:8000",  # Local backend
+        "http://127.0.0.1:3000",  # Alternative localhost
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Serve static files (uploads) - disabled for Vercel (use /tmp or cloud storage)

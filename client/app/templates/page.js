@@ -10,11 +10,13 @@ import Loading from '@/components/Loading';
 import { productAPI } from '@/lib/api';
 import { normalizeImageUrl } from '@/lib/imageHelper';
 
-export default function Portfolio() {
+export default function Templates() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [categories, setCategories] = useState(['all']);
+  const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState({});
 
   useEffect(() => {
     fetchProducts();
@@ -94,17 +96,84 @@ export default function Portfolio() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card hover={true} className="h-full flex flex-col">
+                <Card 
+                  hover={true} 
+                  className="h-full flex flex-col"
+                  onMouseEnter={() => setHoveredProduct(product.id)}
+                  onMouseLeave={() => {
+                    setHoveredProduct(null);
+                    setCurrentImageIndex({ ...currentImageIndex, [product.id]: 0 });
+                  }}
+                >
                   {/* Product Image */}
-                  <div className="relative w-full h-64 mb-6 rounded-xl overflow-hidden">
+                  <div className="relative w-full h-64 mb-6 rounded-xl overflow-hidden group">
                     {product.image_url ? (
-                      <Image
-                        src={normalizeImageUrl(product.image_url)}
-                        alt={product.title}
-                        fill
-                        className="object-cover"
-                        unoptimized={!normalizeImageUrl(product.image_url)?.startsWith('https://devbyzain-backend.vercel.app')}
-                      />
+                      <>
+                        <Image
+                          src={normalizeImageUrl(
+                            (() => {
+                              const additionalImages = product.additional_images 
+                                ? JSON.parse(product.additional_images) 
+                                : [];
+                              const allImages = [product.image_url, ...additionalImages];
+                              const imgIndex = currentImageIndex[product.id] || 0;
+                              return allImages[imgIndex] || product.image_url;
+                            })()
+                          )}
+                          alt={product.title}
+                          fill
+                          className={`object-cover transition-all duration-300 ${
+                            hoveredProduct === product.id ? 'scale-110' : 'scale-100'
+                          }`}
+                          unoptimized={!normalizeImageUrl(product.image_url)?.startsWith('https://devbyzain-backend.vercel.app')}
+                        />
+                        
+                        {/* Image Navigation Dots */}
+                        {product.additional_images && JSON.parse(product.additional_images).length > 0 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const additionalImages = JSON.parse(product.additional_images);
+                                const allImages = [product.image_url, ...additionalImages];
+                                const currentIndex = currentImageIndex[product.id] || 0;
+                                const newIndex = currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+                                setCurrentImageIndex({ ...currentImageIndex, [product.id]: newIndex });
+                              }}
+                              className="bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm"
+                            >
+                              ‹
+                            </button>
+                            {[product.image_url, ...JSON.parse(product.additional_images)].map((_, idx) => (
+                              <button
+                                key={idx}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentImageIndex({ ...currentImageIndex, [product.id]: idx });
+                                }}
+                                className={`w-2 h-2 rounded-full transition-all ${
+                                  (currentImageIndex[product.id] || 0) === idx 
+                                    ? 'bg-white w-6' 
+                                    : 'bg-white/50'
+                                }`}
+                              />
+                            ))}
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const additionalImages = JSON.parse(product.additional_images);
+                                const allImages = [product.image_url, ...additionalImages];
+                                const currentIndex = currentImageIndex[product.id] || 0;
+                                const newIndex = (currentIndex + 1) % allImages.length;
+                                setCurrentImageIndex({ ...currentImageIndex, [product.id]: newIndex });
+                              }}
+                              className="bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm"
+                            >
+                              ›
+                            </button>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                         <span className="text-white text-4xl font-bold">

@@ -18,6 +18,8 @@ class Product(Base):
     preview_url = Column(String(500))  # URL to live preview/demo of the template
     is_featured = Column(Boolean, default=False)
     is_available = Column(Boolean, default=True)
+    # Tier system fields
+    tier_system = Column(Text)  # JSON string with tier data: {basic: {price, services, delivery_time}, standard: {...}, premium: {...}}
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -54,6 +56,8 @@ class CustomRequest(Base):
     budget_range = Column(String(100))
     timeline = Column(String(100))
     additional_details = Column(Text)
+    selected_tier = Column(String(50))  # 'basic', 'standard', or 'premium'
+    tier_system = Column(Text)  # JSON string with tier data for custom designs
     status = Column(String(50), default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

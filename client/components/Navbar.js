@@ -81,9 +81,9 @@ export default function Navbar() {
               className="flex items-center gap-3"
             >
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <span className="text-white font-bold text-xl">W</span>
+                <span className="text-white font-bold text-xl">D</span>
               </div>
-              <h1 className="text-2xl font-bold gradient-text hidden sm:block">WebShop</h1>
+              <h1 className="text-2xl font-bold gradient-text hidden sm:block">DevbyZain</h1>
             </motion.div>
           </Link>
 

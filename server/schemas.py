@@ -15,6 +15,7 @@ class ProductBase(BaseModel):
     preview_url: Optional[str] = None
     is_featured: bool = False
     is_available: bool = True
+    tier_system: Optional[str] = None
 
 
 class ProductCreate(ProductBase):
@@ -75,6 +76,8 @@ class CustomRequestBase(BaseModel):
     budget_range: Optional[str] = None
     timeline: Optional[str] = None
     additional_details: Optional[str] = None
+    selected_tier: Optional[str] = None
+    tier_system: Optional[str] = None
 
 
 class CustomRequestCreate(CustomRequestBase):

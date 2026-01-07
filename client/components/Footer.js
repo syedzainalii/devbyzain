@@ -13,9 +13,9 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <span className="text-white font-bold text-xl">W</span>
+                <span className="text-white font-bold text-xl">D</span>
               </div>
-              <h3 className="text-2xl font-bold gradient-text">WebShop</h3>
+              <h3 className="text-2xl font-bold gradient-text">DevbyZain</h3>
             </div>
             <p className="text-gray-400">
               Professional website templates and custom design services for your business.
@@ -79,20 +79,20 @@ export default function Footer() {
               <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors text-xl">
                 <FaTwitter />
               </a>
-              <a href="mailto:contact@webshop.com" className="text-gray-400 hover:text-purple-400 transition-colors text-xl">
+              <a href="mailto:contact@devbyzain.com" className="text-gray-400 hover:text-purple-400 transition-colors text-xl">
                 <FaEnvelope />
               </a>
             </div>
             <p className="text-sm text-gray-400">
-              <a href="mailto:contact@webshop.com" className="hover:text-purple-400 transition-colors">
-                contact@webshop.com
+              <a href="mailto:contact@devbyzain.com" className="hover:text-purple-400 transition-colors">
+                contact@devbyzain.com
               </a>
             </p>
           </div>
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {currentYear} WebShop. All rights reserved. Built with React & Next.js</p>
+          <p>&copy; {currentYear} DevbyZain. All rights reserved. Built with React & Next.js</p>
         </div>
       </div>
     </footer>

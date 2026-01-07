@@ -13,7 +13,7 @@ conf = ConnectionConfig(
     MAIL_FROM=os.getenv("MAIL_FROM", "noreply@webshop.com"),
     MAIL_PORT=int(os.getenv("MAIL_PORT", 587)),
     MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
-    MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME", "WebShop"),
+    MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME", "DevbyZain"),
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
@@ -52,7 +52,7 @@ async def send_verification_code(email: EmailStr, code: str):
     """
     
     message = MessageSchema(
-        subject="Your Verification Code - WebShop",
+        subject="Your Verification Code - DevbyZain",
         recipients=[email],
         body=html,
         subtype="html"
@@ -204,7 +204,7 @@ async def send_password_reset_email(email: EmailStr, token: str):
     """
     
     message = MessageSchema(
-        subject="Reset Your Password - WebShop",
+        subject="Reset Your Password - DevbyZain",
         recipients=[email],
         body=html,
         subtype="html"

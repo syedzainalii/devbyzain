@@ -19,6 +19,7 @@ export default function AdminProducts() {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,6 +30,11 @@ export default function AdminProducts() {
     features: '',
     is_featured: false,
     is_available: true,
+    tier_system: {
+      basic: { price: '', services: '', delivery_time: '' },
+      standard: { price: '', services: '', delivery_time: '' },
+      premium: { price: '', services: '', delivery_time: '' }
+    }
   });
 
   useEffect(() => {
@@ -71,6 +77,28 @@ export default function AdminProducts() {
     }
   };
 
+  const handleAdditionalImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadPromises = files.map(file => uploadAPI.upload(file));
+      const responses = await Promise.all(uploadPromises);
+      const newImageUrls = responses.map(res => res.data.url);
+      setAdditionalImages([...additionalImages, ...newImageUrls]);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('Failed to upload some files');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeAdditionalImage = (index) => {
+    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -78,6 +106,8 @@ export default function AdminProducts() {
       ...formData,
       price: parseFloat(formData.price),
       features: formData.features ? JSON.stringify(formData.features.split('\n').filter(f => f.trim())) : null,
+      additional_images: additionalImages.length > 0 ? JSON.stringify(additionalImages) : null,
+      tier_system: JSON.stringify(formData.tier_system)
     };
 
     try {
@@ -90,6 +120,7 @@ export default function AdminProducts() {
       setShowForm(false);
       setEditingProduct(null);
       resetForm();
+      setAdditionalImages([]);
       fetchProducts();
     } catch (error) {
       console.error('Error saving product:', error);
@@ -99,6 +130,21 @@ export default function AdminProducts() {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
+    
+    let tierSystem = {
+      basic: { price: '', services: '', delivery_time: '' },
+      standard: { price: '', services: '', delivery_time: '' },
+      premium: { price: '', services: '', delivery_time: '' }
+    };
+    
+    if (product.tier_system) {
+      try {
+        tierSystem = JSON.parse(product.tier_system);
+      } catch (e) {
+        console.error('Error parsing tier_system:', e);
+      }
+    }
+    
     setFormData({
       title: product.title,
       description: product.description || '',
@@ -109,7 +155,20 @@ export default function AdminProducts() {
       features: product.features ? JSON.parse(product.features).join('\n') : '',
       is_featured: product.is_featured,
       is_available: product.is_available,
+      tier_system: tierSystem
     });
+    
+    if (product.additional_images) {
+      try {
+        setAdditionalImages(JSON.parse(product.additional_images));
+      } catch (e) {
+        console.error('Error parsing additional_images:', e);
+        setAdditionalImages([]);
+      }
+    } else {
+      setAdditionalImages([]);
+    }
+    
     setShowForm(true);
   };
 
@@ -136,7 +195,13 @@ export default function AdminProducts() {
       features: '',
       is_featured: false,
       is_available: true,
+      tier_system: {
+        basic: { price: '', services: '', delivery_time: '' },
+        standard: { price: '', services: '', delivery_time: '' },
+        premium: { price: '', services: '', delivery_time: '' }
+      }
     });
+    setAdditionalImages([]);
   };
 
   if (loading) return <Loading />;
@@ -241,7 +306,7 @@ export default function AdminProducts() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Product Image</label>
+                  <label className="block text-sm font-semibold mb-2">Main Product Image</label>
                   <div className="flex gap-4 items-center">
                     <input
                       type="file"
@@ -267,6 +332,106 @@ export default function AdminProducts() {
                       </div>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Additional Images</label>
+                  <div className="space-y-4">
+                    <input
+                      type="file"
+                      onChange={handleAdditionalImageUpload}
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      id="additional-file-upload"
+                    />
+                    <label htmlFor="additional-file-upload">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        icon={<FaUpload />}
+                        onClick={() => document.getElementById('additional-file-upload').click()}
+                        disabled={uploading}
+                      >
+                        {uploading ? 'Uploading...' : 'Upload Multiple Images'}
+                      </Button>
+                    </label>
+                    {additionalImages.length > 0 && (
+                      <div className="grid grid-cols-4 gap-4">
+                        {additionalImages.map((imgUrl, index) => (
+                          <div key={index} className="relative group">
+                            <div className="relative w-full h-20 rounded-lg overflow-hidden">
+                              <Image src={normalizeImageUrl(imgUrl)} alt={`Additional ${index + 1}`} fill className="object-cover" unoptimized />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeAdditionalImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-6 p-6 bg-white/5 rounded-xl border border-white/10">
+                  <h3 className="text-xl font-bold gradient-text">Tier System (Optional)</h3>
+                  <p className="text-sm text-gray-400">Configure different pricing tiers for this template with varying services and delivery times.</p>
+                  
+                  {['basic', 'standard', 'premium'].map((tier) => (
+                    <div key={tier} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <h4 className="text-lg font-semibold capitalize mb-4 text-purple-400">{tier} Tier</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Price ($)</label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={formData.tier_system[tier].price}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              tier_system: {
+                                ...formData.tier_system,
+                                [tier]: { ...formData.tier_system[tier], price: e.target.value }
+                              }
+                            })}
+                            placeholder="99.00"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Services Included</label>
+                          <Input
+                            value={formData.tier_system[tier].services}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              tier_system: {
+                                ...formData.tier_system,
+                                [tier]: { ...formData.tier_system[tier], services: e.target.value }
+                              }
+                            })}
+                            placeholder="Basic setup, 3 pages"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Delivery Time</label>
+                          <Input
+                            value={formData.tier_system[tier].delivery_time}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              tier_system: {
+                                ...formData.tier_system,
+                                [tier]: { ...formData.tier_system[tier], delivery_time: e.target.value }
+                              }
+                            })}
+                            placeholder="3-5 days"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex gap-6">

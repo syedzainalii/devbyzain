@@ -23,7 +23,12 @@ export default function EditCustomPage() {
       { title: 'Fast Delivery', description: 'Quick turnaround time to get your website up and running fast.' },
       { title: 'SEO Ready', description: 'Optimized structure and code for better search engine rankings.' },
       { title: 'Easy to Customize', description: 'Clean code that is easy to modify and extend for future needs.' },
-    ]
+    ],
+    tier_system: {
+      basic: { price: '500', services: 'Basic website, 3 pages, responsive design', delivery_time: '5-7 days' },
+      standard: { price: '1500', services: 'Standard website, 5 pages, responsive design, SEO optimization, contact forms', delivery_time: '10-14 days' },
+      premium: { price: '3500', services: 'Premium website, 10+ pages, responsive design, SEO optimization, contact forms, custom features, CMS integration', delivery_time: '3-4 weeks' }
+    }
   });
 
   useEffect(() => {
@@ -192,6 +197,77 @@ export default function EditCustomPage() {
                       value={feature.description}
                       onChange={(e) => updateFeature(index, 'description', e.target.value)}
                       placeholder="Feature description"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Tier System Section */}
+        <Card className="mb-8">
+          <h2 className="text-2xl font-bold mb-6">Tier System</h2>
+          <p className="text-gray-400 mb-6">Configure different pricing tiers for custom design services.</p>
+          
+          <div className="space-y-6">
+            {['basic', 'standard', 'premium'].map((tier) => (
+              <div key={tier} className="p-4 rounded-lg bg-white/5 border border-white/10">
+                <h3 className="text-lg font-semibold capitalize mb-4 text-purple-400">{tier} Tier</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-300">
+                      Price ($)
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={content.tier_system[tier].price}
+                      onChange={(e) => setContent({
+                        ...content,
+                        tier_system: {
+                          ...content.tier_system,
+                          [tier]: { ...content.tier_system[tier], price: e.target.value }
+                        }
+                      })}
+                      placeholder="500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-300">
+                      Services Included
+                    </label>
+                    <textarea
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows={2}
+                      value={content.tier_system[tier].services}
+                      onChange={(e) => setContent({
+                        ...content,
+                        tier_system: {
+                          ...content.tier_system,
+                          [tier]: { ...content.tier_system[tier], services: e.target.value }
+                        }
+                      })}
+                      placeholder="List of services included in this tier"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-300">
+                      Delivery Time
+                    </label>
+                    <Input
+                      type="text"
+                      value={content.tier_system[tier].delivery_time}
+                      onChange={(e) => setContent({
+                        ...content,
+                        tier_system: {
+                          ...content.tier_system,
+                          [tier]: { ...content.tier_system[tier], delivery_time: e.target.value }
+                        }
+                      })}
+                      placeholder="5-7 days"
                     />
                   </div>
                 </div>

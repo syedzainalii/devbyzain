@@ -44,8 +44,14 @@ export default function Services() {
         title: 'Easy to Customize',
         description: 'Clean code that is easy to modify and extend for future needs.',
       },
-    ]
+    ],
+    tier_system: {
+      basic: { price: '500', services: 'Basic website, 3 pages, responsive design', delivery_time: '5-7 days' },
+      standard: { price: '1500', services: 'Standard website, 5 pages, responsive design, SEO optimization, contact forms', delivery_time: '10-14 days' },
+      premium: { price: '3500', services: 'Premium website, 10+ pages, responsive design, SEO optimization, contact forms, custom features, CMS integration', delivery_time: '3-4 weeks' }
+    }
   });
+  const [selectedTier, setSelectedTier] = useState('basic');
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -55,6 +61,7 @@ export default function Services() {
     budget_range: '',
     timeline: '',
     additional_details: '',
+    selected_tier: 'basic',
   });
 
   useEffect(() => {
@@ -109,7 +116,9 @@ export default function Services() {
         budget_range: '',
         timeline: '',
         additional_details: '',
+        selected_tier: 'basic',
       });
+      setSelectedTier('basic');
     } catch (error) {
       console.error('Error submitting request:', error);
       alert('Failed to submit request. Please try again.');
@@ -140,9 +149,9 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Request Info Section */}
+      {/* Pricing Tiers Section */}
       <section className="section-padding">
-        <div className="container-custom max-w-4xl">
+        <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -150,12 +159,63 @@ export default function Services() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Request Your Custom Website
+              Choose Your <span className="gradient-text">Package</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Fill out the form below with your project details and we'll send you a quote
+              Select the package that best fits your needs and budget
             </p>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+            {['basic', 'standard', 'premium'].map((tier, index) => (
+              <motion.div
+                key={tier}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card 
+                  hover={true}
+                  className={`h-full cursor-pointer transition-all ${
+                    selectedTier === tier ? 'ring-2 ring-purple-500 scale-105' : ''
+                  }`}
+                  onClick={() => {
+                    setSelectedTier(tier);
+                    setFormData({ ...formData, selected_tier: tier });
+                  }}
+                >
+                  <div className={`w-16 h-16 bg-gradient-to-br ${
+                    tier === 'basic' ? 'from-blue-500 to-cyan-500' :
+                    tier === 'standard' ? 'from-indigo-500 to-purple-500' :
+                    'from-purple-500 to-pink-500'
+                  } rounded-xl flex items-center justify-center mb-6 text-3xl`}>
+                    {tier === 'basic' ? '🌟' : tier === 'standard' ? '🚀' : '💎'}
+                  </div>
+                  <h3 className="text-3xl font-bold mb-2 capitalize">{tier}</h3>
+                  <div className="text-5xl font-bold gradient-text mb-4">
+                    ${pageContent.tier_system[tier].price}
+                  </div>
+                  <p className="text-gray-400 mb-4">
+                    ⏱️ {pageContent.tier_system[tier].delivery_time}
+                  </p>
+                  <div className="mb-6 p-4 bg-white/5 rounded-lg">
+                    <h4 className="font-semibold mb-2 text-purple-400">Includes:</h4>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      {pageContent.tier_system[tier].services}
+                    </p>
+                  </div>
+                  {selectedTier === tier && (
+                    <div className="mt-4 text-center">
+                      <span className="inline-block bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        ✓ Selected
+                      </span>
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

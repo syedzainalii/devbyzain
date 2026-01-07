@@ -16,6 +16,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedTier, setSelectedTier] = useState('basic');
 
   useEffect(() => {
     if (params.id) {
@@ -42,8 +43,8 @@ export default function ProductDetail() {
       <div className="section-padding">
         <div className="container-custom text-center">
           <h1 className="text-4xl font-bold mb-4">Product Not Found</h1>
-          <Link href="/portfolio">
-            <Button variant="primary">Back to Portfolio</Button>
+          <Link href="/templates">
+            <Button variant="primary">Back to Templates</Button>
           </Link>
         </div>
       </div>
@@ -58,6 +59,12 @@ export default function ProductDetail() {
     ? JSON.parse(product.features) 
     : [];
 
+  const tierSystem = product.tier_system
+    ? JSON.parse(product.tier_system)
+    : null;
+
+  const allImages = [product.image_url, ...additionalImages].filter(Boolean);
+
   return (
     <div className="section-padding">
       <div className="container-custom">
@@ -67,9 +74,9 @@ export default function ProductDetail() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-8"
         >
-          <Link href="/portfolio">
+          <Link href="/templates">
             <Button variant="ghost" icon={<FaArrowLeft />}>
-              Back to Portfolio
+              Back to Templates
             </Button>
           </Link>
         </motion.div>
@@ -100,27 +107,14 @@ export default function ProductDetail() {
             </div>
 
             {/* Thumbnail Images */}
-            {additionalImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-4">
-                <div
-                  onClick={() => setSelectedImage(product.image_url)}
-                  className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 ${
-                    selectedImage === product.image_url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                >
-                  <Image
-                    src={product.image_url}
-                    alt="Main"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                {additionalImages.map((img, index) => (
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-5 gap-4">
+                {allImages.map((img, index) => (
                   <div
                     key={index}
                     onClick={() => setSelectedImage(img)}
-                    className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 ${
-                      selectedImage === img ? 'border-purple-500' : 'border-transparent'
+                    className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all hover:border-purple-400 ${
+                      selectedImage === img ? 'border-purple-500 scale-105' : 'border-transparent'
                     }`}
                   >
                     <Image
@@ -157,9 +151,50 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="text-5xl font-bold gradient-text mb-6">
-              ${product.price}
-            </div>
+            {tierSystem && (tierSystem.basic?.price || tierSystem.standard?.price || tierSystem.premium?.price) ? (
+              <>
+                {/* Tier Selection */}
+                <Card className="mb-6">
+                  <h3 className="text-2xl font-bold mb-4">Choose Your Tier</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {['basic', 'standard', 'premium'].map((tier) => {
+                      if (!tierSystem[tier]?.price) return null;
+                      return (
+                        <button
+                          key={tier}
+                          onClick={() => setSelectedTier(tier)}
+                          className={`p-4 rounded-xl border-2 transition-all text-left ${
+                            selectedTier === tier
+                              ? 'border-purple-500 bg-purple-500/20'
+                              : 'border-white/10 bg-white/5 hover:border-purple-400'
+                          }`}
+                        >
+                          <h4 className="text-lg font-bold capitalize mb-2">{tier}</h4>
+                          <p className="text-3xl font-bold gradient-text mb-2">
+                            ${tierSystem[tier].price}
+                          </p>
+                          {tierSystem[tier].delivery_time && (
+                            <p className="text-sm text-gray-400">
+                              ⏱️ {tierSystem[tier].delivery_time}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {tierSystem[selectedTier]?.services && (
+                    <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                      <h4 className="font-semibold mb-2">What's Included:</h4>
+                      <p className="text-gray-300">{tierSystem[selectedTier].services}</p>
+                    </div>
+                  )}
+                </Card>
+              </>
+            ) : (
+              <div className="text-5xl font-bold gradient-text mb-6">
+                ${product.price}
+              </div>
+            )}
 
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               {product.description}
@@ -247,7 +282,7 @@ export default function ProductDetail() {
             You May Also <span className="gradient-text">Like</span>
           </h2>
           <div className="text-center">
-            <Link href="/portfolio">
+            <Link href="/templates">
               <Button variant="secondary">View All Products</Button>
             </Link>
           </div>

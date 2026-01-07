@@ -4,8 +4,8 @@ import Footer from '@/components/Footer'
 import ParticleBackground from '@/components/ParticleBackground'
 
 export const metadata = {
-  title: 'WebShop - Premium Website Templates & Custom Design',
-  description: 'Buy professional website templates or request custom web design services. Modern, responsive designs built with React and Next.js.',
+  title: 'DevbyZain - Premium Website Templates & Custom Design',
+  description: 'Buy professional website templates or request custom web design services by DevbyZain. Modern, responsive designs built with React and Next.js.',
 }
 
 export default function RootLayout({ children }) {

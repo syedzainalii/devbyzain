@@ -230,36 +230,29 @@ export default function ProductDetail() {
 
             {/* Action Buttons */}
             {product.is_available ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {product.preview_url && (
-                  <Button 
-                    variant="primary" 
-                    className="w-full" 
-                    icon={<FaExternalLinkAlt />}
+                  <button
                     onClick={() => window.open(product.preview_url, '_blank')}
+                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50"
                   >
+                    <FaExternalLinkAlt />
                     View Live Preview
-                  </Button>
+                  </button>
                 )}
                 
-                <Link href={`/order?product=${product.id}&type=purchase`}>
-                  <Button 
-                    variant="primary" 
-                    className="w-full" 
-                    icon={<FaShoppingCart />}
-                  >
-                    Buy Now - ${product.price}
-                  </Button>
+                <Link href={`/order?product=${product.id}&type=purchase`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50">
+                    <FaShoppingCart />
+                    Buy Now - ${tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
+                  </button>
                 </Link>
                 
-                <Link href={`/order?product=${product.id}&type=customization`}>
-                  <Button 
-                    variant="secondary" 
-                    className="w-full" 
-                    icon={<FaEdit />}
-                  >
+                <Link href={`/order?product=${product.id}&type=customization`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] border border-white/20 hover:border-white/30">
+                    <FaEdit />
                     Request Customization
-                  </Button>
+                  </button>
                 </Link>
               </div>
             ) : (
@@ -269,18 +262,6 @@ export default function ProductDetail() {
                 </p>
               </div>
             )}
-
-            {/* Additional Info */}
-            <Card className="mt-8">
-              <h3 className="text-xl font-bold mb-4">What's Included</h3>
-              <ul className="space-y-2 text-gray-300">
-                <li>✓ Full source code</li>
-                <li>✓ Documentation</li>
-                <li>✓ Free updates for 1 year</li>
-                <li>✓ Email support</li>
-                <li>✓ Lifetime license</li>
-              </ul>
-            </Card>
           </motion.div>
         </div>
 

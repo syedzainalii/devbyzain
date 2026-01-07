@@ -110,7 +110,7 @@ export default function Home() {
                   <Link href="/custom">
                     <button className="px-8 py-5 bg-white/5 border-2 border-white/20 backdrop-blur-xl rounded-2xl font-bold text-lg flex items-center gap-3 hover:bg-white/10 hover:border-white/40 hover:scale-105 transition-all duration-300">
                       <FaPlay className="text-purple-400" />
-                      Watch Demo
+                      Custom Design
                     </button>
                   </Link>
                 </motion.div>
@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* Horizontal Scrolling Templates Showcase */}
-      <section className="py-24 bg-gradient-to-b from-slate-900 to-slate-950">
+      <section className="py-24 bg-gradient-to-b from-transparent to-purple-900/25 overflow-hidden">
         <div className="container-custom mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -311,7 +311,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-6">
-                  <span className="text-5xl font-black gradient-text">$99</span>
+                  <span className="text-5xl font-black gradient-text">Rs 1000</span>
                   <span className="text-gray-500">starting from</span>
                 </div>
 
@@ -365,7 +365,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-6">
-                  <span className="text-5xl font-black gradient-text">$999</span>
+                  <span className="text-5xl font-black gradient-text">Rs 1500</span>
                   <span className="text-gray-500">starting from</span>
                 </div>
 
@@ -415,39 +415,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Final CTA - Bold */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative max-w-5xl mx-auto"
-          >
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 rounded-3xl blur-2xl opacity-50"></div>
-            <div className="relative bg-slate-900 border border-white/20 rounded-3xl p-16 text-center">
-              <h2 className="text-5xl md:text-7xl font-black mb-6">
-                Ready to Ship?
-              </h2>
-              <p className="text-2xl text-gray-300 mb-12 max-w-2xl mx-auto">
-                Join 500+ businesses who launched faster with our platform
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center">
-                <Link href="/templates">
-                  <button className="px-10 py-5 bg-white text-slate-900 rounded-2xl font-black text-xl hover:scale-105 transition-transform duration-300 shadow-2xl">
-                    Start Now →
-                  </button>
-                </Link>
-                <Link href="/custom">
-                  <button className="px-10 py-5 bg-white/10 border border-white/20 backdrop-blur-xl rounded-2xl font-black text-xl hover:bg-white/20 hover:scale-105 transition-all duration-300">
-                    Talk to Expert
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       <style jsx>{`
         @keyframes float {
@@ -483,4 +450,4 @@ export default function Home() {
       `}</style>
     </div>
   );
-}
+} 

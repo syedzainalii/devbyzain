@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaUser, FaSignOutAlt, FaShoppingCart, FaTachometerAlt, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaSignOutAlt, FaShoppingCart, FaTachometerAlt } from 'react-icons/fa';
 import { authAPI } from '@/lib/api';
 
 export default function Navbar() {
@@ -16,13 +16,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check for authenticated user
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('token');
@@ -41,11 +40,9 @@ export default function Navbar() {
     };
     
     checkAuth();
-    
-    // Listen for storage changes (login/logout in other tabs)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
-  }, []); // Remove pathname dependency - only check auth once on mount
+  }, []);
 
   const handleLogout = () => {
     authAPI.logout();
@@ -58,129 +55,135 @@ export default function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Templates', href: '/templates' },
     { name: 'Custom Design', href: '/custom' },
-    { name: 'About Us', href: '/about' },
+    { name: 'About', href: '/about' },
   ];
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'glass-card border-b border-white/10 shadow-lg shadow-purple-500/10' 
-          : 'bg-transparent'
-      }`}
-    >
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+      scrolled 
+        ? 'bg-slate-950/95 backdrop-blur-xl border-b border-white/10 shadow-2xl' 
+        : 'bg-transparent'
+    }`}>
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 cursor-pointer"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <span className="text-white font-bold text-xl">D</span>
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <span className="text-white font-black text-2xl">D</span>
               </div>
-              <h1 className="text-2xl font-bold gradient-text hidden sm:block">DevbyZain</h1>
+              <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+                DevbyZain
+              </h1>
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation - Centered */}
-          <div className="hidden lg:flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link key={link.name} href={link.href}>
                 <motion.div
-                  className={`relative px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  className={`relative px-6 py-3 font-semibold text-base transition-all ${
                     pathname === link.href
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-purple-500/50'
-                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-white'
                   }`}
-                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {link.name}
+                  {pathname === link.href && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </motion.div>
               </Link>
             ))}
           </div>
             
-          {/* Auth Buttons / User Menu - Right Corner */}
-          <div className="hidden lg:flex items-center gap-2 ml-auto">
+          {/* Auth Section */}
+          <div className="hidden lg:flex items-center gap-4">
             {user ? (
-              <div 
-                className="relative"
-                onMouseEnter={() => setShowUserMenu(true)}
-                onMouseLeave={() => setShowUserMenu(false)}
-              >
+              <div className="relative">
                 <motion.button
-                  className="px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
-                  whileHover={{ scale: 1.05, y: -2 }}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <FaUser className="text-sm" />
-                  <span>{user.name || user.email.split('@')[0]}</span>
-                  <FaChevronDown className="text-xs" />
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                    <FaUser className="text-white text-sm" />
+                  </div>
+                  <span className="font-semibold text-white">{user.name || user.email.split('@')[0]}</span>
                 </motion.button>
 
-                {/* User Dropdown Menu */}
                 <AnimatePresence>
                   {showUserMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-56 glass-card border border-white/10 rounded-xl shadow-xl overflow-hidden"
-                    >
-                      <div className="p-3 border-b border-white/10">
-                        <p className="text-sm text-gray-400">Signed in as</p>
-                        <p className="text-sm font-semibold text-white truncate">{user.email}</p>
-                        {user.is_admin && (
-                          <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                            Admin
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="py-2">
-                        {user.is_admin && (
-                          <Link href="/admin">
-                            <motion.button
-                              className="w-full px-4 py-2.5 text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3"
-                              whileHover={{ x: 5 }}
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0"
+                        onClick={() => setShowUserMenu(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-2 w-64 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                      >
+                        <div className="p-4 border-b border-white/10">
+                          <p className="text-sm font-semibold text-white">{user.name || user.email.split('@')[0]}</p>
+                          <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                          {user.is_admin && (
+                            <span className="inline-block mt-2 px-3 py-1 text-xs font-bold bg-purple-500 text-white rounded-full">
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="py-2">
+                          {user.is_admin && (
+                            <Link href="/admin">
+                              <button
+                                className="w-full px-4 py-3 text-left text-gray-300 hover:bg-white/5 transition-all flex items-center gap-3"
+                                onClick={() => setShowUserMenu(false)}
+                              >
+                                <FaTachometerAlt className="text-purple-400" />
+                                <span>Admin Dashboard</span>
+                              </button>
+                            </Link>
+                          )}
+                          
+                          <Link href="/order">
+                            <button
+                              className="w-full px-4 py-3 text-left text-gray-300 hover:bg-white/5 transition-all flex items-center gap-3"
                               onClick={() => setShowUserMenu(false)}
                             >
-                              <FaTachometerAlt className="text-purple-400" />
-                              <span>Admin Dashboard</span>
-                            </motion.button>
+                              <FaShoppingCart className="text-blue-400" />
+                              <span>My Orders</span>
+                            </button>
                           </Link>
-                        )}
-                        
-                        <Link href="/order">
-                          <motion.button
-                            className="w-full px-4 py-2.5 text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3"
-                            whileHover={{ x: 5 }}
-                            onClick={() => setShowUserMenu(false)}
+                          
+                          <div className="border-t border-white/10 my-2"></div>
+                          
+                          <button
+                            className="w-full px-4 py-3 text-left text-red-400 hover:bg-red-500/10 transition-all flex items-center gap-3"
+                            onClick={handleLogout}
                           >
-                            <FaShoppingCart className="text-blue-400" />
-                            <span>My Orders</span>
-                          </motion.button>
-                        </Link>
-                        
-                        <div className="border-t border-white/10 my-2"></div>
-                        
-                        <motion.button
-                          className="w-full px-4 py-2.5 text-left text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all flex items-center gap-3"
-                          whileHover={{ x: 5 }}
-                          onClick={handleLogout}
-                        >
-                          <FaSignOutAlt />
-                          <span>Logout</span>
-                        </motion.button>
-                      </div>
-                    </motion.div>
+                            <FaSignOutAlt />
+                            <span>Logout</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    </>
                   )}
                 </AnimatePresence>
               </div>
@@ -188,18 +191,17 @@ export default function Navbar() {
               <>
                 <Link href="/login">
                   <motion.button
-                    className="px-5 py-2.5 rounded-xl font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition-all flex items-center gap-2"
-                    whileHover={{ scale: 1.05, y: -2 }}
+                    className="px-6 py-3 font-semibold text-gray-300 hover:text-white transition-all"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <FaUser className="text-sm" />
-                    <span>Login</span>
+                    Login
                   </motion.button>
                 </Link>
                 <Link href="/signup">
                   <motion.button
-                    className="px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-purple-500/30"
-                    whileHover={{ scale: 1.05, y: -2 }}
+                    className="px-6 py-3 font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/50"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     Sign Up
@@ -211,7 +213,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="lg:hidden text-white text-2xl p-2 hover:bg-white/5 rounded-lg"
+            className="lg:hidden text-white text-2xl"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.9 }}
           >
@@ -219,14 +221,14 @@ export default function Navbar() {
           </motion.button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden overflow-hidden"
+              className="lg:hidden overflow-hidden border-t border-white/10"
             >
               <div className="py-4 space-y-2">
                 {navLinks.map((link) => (
@@ -234,7 +236,7 @@ export default function Navbar() {
                     <motion.div
                       className={`block px-4 py-3 rounded-xl font-semibold transition-colors ${
                         pathname === link.href
-                          ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
                           : 'text-gray-300 hover:bg-white/5 hover:text-white'
                       }`}
                       onClick={() => setIsOpen(false)}
@@ -245,16 +247,15 @@ export default function Navbar() {
                   </Link>
                 ))}
                 
-                {/* Mobile Auth Buttons / User Menu */}
                 <div className="pt-4 space-y-2 border-t border-white/10">
                   {user ? (
                     <>
-                      <div className="px-4 py-3 glass-card rounded-xl border border-white/10">
-                        <p className="text-xs text-gray-400">Signed in as</p>
-                        <p className="text-sm font-semibold text-white truncate">{user.email}</p>
+                      <div className="px-4 py-3 bg-white/5 rounded-xl border border-white/10">
+                        <p className="text-sm font-semibold text-white">{user.name || user.email.split('@')[0]}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
                         {user.is_admin && (
-                          <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                            Admin
+                          <span className="inline-block mt-2 px-3 py-1 text-xs font-bold bg-purple-500 text-white rounded-full">
+                            ADMIN
                           </span>
                         )}
                       </div>
@@ -299,17 +300,16 @@ export default function Navbar() {
                     <>
                       <Link href="/login">
                         <motion.button
-                          className="w-full px-4 py-3 rounded-xl font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2"
+                          className="w-full px-4 py-3 rounded-xl font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition-all"
                           onClick={() => setIsOpen(false)}
                           whileTap={{ scale: 0.95 }}
                         >
-                          <FaUser className="text-sm" />
                           Login
                         </motion.button>
                       </Link>
                       <Link href="/signup">
                         <motion.button
-                          className="w-full px-4 py-3 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white transition-all"
+                          className="w-full px-4 py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 text-white transition-all"
                           onClick={() => setIsOpen(false)}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -324,6 +324,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </div>
-    </motion.nav>
+    </nav>
   );
 }

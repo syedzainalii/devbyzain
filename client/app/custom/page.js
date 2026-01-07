@@ -192,7 +192,7 @@ export default function Services() {
                     </label>
                     <Input
                       name="customer_name"
-                      placeholder="John Doe"
+                      placeholder="Syed Zain Ali"
                       value={formData.customer_name}
                       onChange={handleChange}
                       required
@@ -206,7 +206,7 @@ export default function Services() {
                     <Input
                       type="email"
                       name="customer_email"
-                      placeholder="john@example.com"
+                      placeholder="name@example.com"
                       value={formData.customer_email}
                       onChange={handleChange}
                       required
@@ -220,7 +220,7 @@ export default function Services() {
                     <Input
                       type="tel"
                       name="customer_phone"
-                      placeholder="+91 98765 43210"
+                      placeholder="+92 312 3456789"
                       value={formData.customer_phone}
                       onChange={handleChange}
                     />

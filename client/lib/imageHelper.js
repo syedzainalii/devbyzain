@@ -14,10 +14,18 @@ export function normalizeImageUrl(imageUrl) {
   }
 
   // Determine the API URL based on environment
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
-                 (typeof window !== 'undefined' && window.location.hostname === 'devbyzain.vercel.app' 
-                   ? 'https://devbyzain-backend.vercel.app'
-                   : 'http://localhost:8000');
+  // Check if we're in production by looking at the hostname
+  let apiUrl = 'http://localhost:8000'; // Default for development
+  
+  if (typeof window !== 'undefined') {
+    // In browser - check the hostname
+    if (window.location.hostname.includes('vercel.app') || window.location.hostname === 'devbyzain.vercel.app') {
+      apiUrl = 'https://devbyzain-backend.vercel.app';
+    }
+  } else if (process.env.NEXT_PUBLIC_API_URL) {
+    // Server-side or env variable set
+    apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
 
   // If it's in the old /uploads/ format, convert to new format
   if (imageUrl.startsWith('/uploads/')) {

@@ -13,18 +13,20 @@ export function normalizeImageUrl(imageUrl) {
     return imageUrl;
   }
 
+  // Determine the API URL based on environment
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+                 (typeof window !== 'undefined' && window.location.hostname === 'devbyzain.vercel.app' 
+                   ? 'https://devbyzain-backend.vercel.app'
+                   : 'http://localhost:8000');
+
   // If it's in the old /uploads/ format, convert to new format
   if (imageUrl.startsWith('/uploads/')) {
     const filename = imageUrl.replace('/uploads/', '');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    
-    // Use /api/files endpoint for serving
     return `${apiUrl}/api/files/${filename}`;
   }
 
   // If it's a relative path without /uploads/, assume it's a filename
   if (!imageUrl.startsWith('/')) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     return `${apiUrl}/api/files/${imageUrl}`;
   }
 

@@ -184,9 +184,26 @@ export default function Templates() {
                     
                     {/* Price Badge */}
                     <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full">
-                      <span className="text-2xl font-bold gradient-text">
-                        ${product.price}
-                      </span>
+                      {(() => {
+                        try {
+                          const tierSystem = product.tier_system ? JSON.parse(product.tier_system) : null;
+                          const basicPrice = tierSystem?.basic?.price;
+                          if (basicPrice) {
+                            return (
+                              <span className="text-xl font-bold gradient-text">
+                                From ${basicPrice}
+                              </span>
+                            );
+                          }
+                        } catch (e) {
+                          console.error('Error parsing tier_system:', e);
+                        }
+                        return (
+                          <span className="text-2xl font-bold gradient-text">
+                            ${product.price}
+                          </span>
+                        );
+                      })()}
                     </div>
                     
                     {product.is_featured && (

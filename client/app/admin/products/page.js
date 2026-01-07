@@ -23,7 +23,7 @@ export default function AdminProducts() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    price: '',
+    price: '0', // Default to 0 since we're using tier pricing
     category: '',
     image_url: '',
     preview_url: '',
@@ -242,26 +242,13 @@ export default function AdminProducts() {
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Title *</label>
-                    <Input
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Price *</label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      required
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Title *</label>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    required
+                  />
                 </div>
 
                 <div>
@@ -378,8 +365,8 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="space-y-6 p-6 bg-white/5 rounded-xl border border-white/10">
-                  <h3 className="text-xl font-bold gradient-text">Tier System (Optional)</h3>
-                  <p className="text-sm text-gray-400">Configure different pricing tiers for this template with varying services and delivery times.</p>
+                  <h3 className="text-xl font-bold gradient-text">Tier Pricing System *</h3>
+                  <p className="text-sm text-gray-400">Configure pricing tiers for this template. Set prices, services, and delivery times for each tier.</p>
                   
                   {['basic', 'standard', 'premium'].map((tier) => (
                     <div key={tier} className="p-4 bg-white/5 rounded-lg border border-white/10">

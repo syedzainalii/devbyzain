@@ -54,20 +54,15 @@ upload_path.mkdir(exist_ok=True, parents=True)
 
 app = FastAPI(title="Portfolio & Marketplace API")
 
-# CORS middleware - Allow requests from frontend
+# CORS middleware - Allow all origins for now
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://devbyzain.vercel.app",  # Production frontend
-        "https://devbyzain-git-main-your-username.vercel.app",  # Vercel preview deployments
-        "http://localhost:3000",  # Local development
-        "http://localhost:8000",  # Local backend
-        "http://127.0.0.1:3000",  # Alternative localhost
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=False,  # Set to False when using allow_origins=["*"]
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Serve static files (uploads) - disabled for Vercel (use /tmp or cloud storage)
@@ -656,6 +651,14 @@ async def update_page_content(
     db.commit()
     db.refresh(db_content)
     return db_content
+
+
+# ==================== CORS PREFLIGHT ====================
+
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    """Handle CORS preflight requests"""
+    return {"status": "ok"}
 
 
 # ==================== HEALTH CHECK ====================

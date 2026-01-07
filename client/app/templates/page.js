@@ -1,274 +1,287 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import Image from 'next/image';
-import { FaShoppingCart, FaEye, FaExternalLinkAlt } from 'react-icons/fa';
-import Card from '@/components/Card';
+import Link from 'next/link';
+import { FaShoppingCart, FaEdit, FaArrowLeft, FaCheck, FaExternalLinkAlt } from 'react-icons/fa';
 import Button from '@/components/Button';
+import Card from '@/components/Card';
 import Loading from '@/components/Loading';
 import { productAPI } from '@/lib/api';
-import { normalizeImageUrl } from '@/lib/imageHelper';
 
-export default function Templates() {
-  const [products, setProducts] = useState([]);
+export default function ProductDetail() {
+  const params = useParams();
+  const router = useRouter();
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
-  const [categories, setCategories] = useState(['all']);
-  const [hoveredProduct, setHoveredProduct] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedTier, setSelectedTier] = useState('basic');
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (params.id) {
+      fetchProduct();
+    }
+  }, [params.id]);
 
-  const fetchProducts = async () => {
+  const fetchProduct = async () => {
     try {
-      const response = await productAPI.getAll();
-      setProducts(response.data);
-      
-      // Extract unique categories
-      const uniqueCategories = ['all', ...new Set(response.data.map(p => p.category).filter(Boolean))];
-      setCategories(uniqueCategories);
+      const response = await productAPI.getById(params.id);
+      setProduct(response.data);
+      setSelectedImage(response.data.image_url);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching product:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredProducts = filter === 'all' 
-    ? products 
-    : products.filter(p => p.category === filter);
-
   if (loading) return <Loading />;
+
+  if (!product) {
+    return (
+      <div className="section-padding">
+        <div className="container-custom text-center">
+          <h1 className="text-4xl font-bold mb-4">Product Not Found</h1>
+          <Link href="/templates">
+            <Button variant="primary">Back to Templates</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const additionalImages = product.additional_images 
+    ? JSON.parse(product.additional_images) 
+    : [];
+  
+  const features = product.features 
+    ? JSON.parse(product.features) 
+    : [];
+
+  const tierSystem = product.tier_system
+    ? JSON.parse(product.tier_system)
+    : null;
+
+  const allImages = [product.image_url, ...additionalImages].filter(Boolean);
 
   return (
     <div className="section-padding">
       <div className="container-custom">
-        {/* Header */}
+        {/* Back Button */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-8"
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Website Templates For Sale
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto">
-            Browse our collection of professional website designs. Purchase and download instantly to use for your business or project.
-          </p>
+          <Link href="/templates">
+            <Button variant="ghost" icon={<FaArrowLeft />}>
+              Back to Templates
+            </Button>
+          </Link>
         </motion.div>
 
-        {/* Filter Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-4 justify-center mb-12"
-        >
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setFilter(category)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 capitalize ${
-                filter === category
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                  : 'glass-card text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Images */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Main Image */}
+            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden mb-4">
+              {selectedImage ? (
+                <Image
+                  src={selectedImage}
+                  alt={product.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                  <span className="text-white text-6xl font-bold">
+                    {product.title.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
 
-        {/* Product Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-2xl text-gray-400">No products found in this category.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card 
-                  hover={true} 
-                  className="h-full flex flex-col"
-                  onMouseEnter={() => setHoveredProduct(product.id)}
-                  onMouseLeave={() => {
-                    setHoveredProduct(null);
-                    setCurrentImageIndex({ ...currentImageIndex, [product.id]: 0 });
-                  }}
-                >
-                  {/* Product Image */}
-                  <div className="relative w-full h-64 mb-6 rounded-xl overflow-hidden group">
-                    {product.image_url ? (
-                      <>
-                        <Image
-                          src={normalizeImageUrl(
-                            (() => {
-                              const additionalImages = product.additional_images 
-                                ? JSON.parse(product.additional_images) 
-                                : [];
-                              const allImages = [product.image_url, ...additionalImages];
-                              const imgIndex = currentImageIndex[product.id] || 0;
-                              return allImages[imgIndex] || product.image_url;
-                            })()
-                          )}
-                          alt={product.title}
-                          fill
-                          className={`object-cover transition-all duration-300 ${
-                            hoveredProduct === product.id ? 'scale-110' : 'scale-100'
+            {/* Thumbnail Images */}
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-5 gap-4 mb-6">
+                {allImages.map((img, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setSelectedImage(img)}
+                    className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all hover:border-purple-400 ${
+                      selectedImage === img ? 'border-purple-500 scale-105' : 'border-transparent'
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Action Buttons - Moved under images */}
+            {product.is_available ? (
+              <div className="space-y-3">
+                {product.preview_url && (
+                  <button
+                    onClick={() => window.open(product.preview_url, '_blank')}
+                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50"
+                  >
+                    <FaExternalLinkAlt />
+                    View Live Preview
+                  </button>
+                )}
+                
+                <Link href={`/order?product=${product.id}&type=purchase`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50">
+                    <FaShoppingCart />
+                    Buy Now - ${tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
+                  </button>
+                </Link>
+                
+                <Link href={`/order?product=${product.id}&type=customization`} className="block">
+                  <button className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] border border-white/20 hover:border-white/30">
+                    <FaEdit />
+                    Request Customization
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <div className="glass-card p-6 text-center">
+                <p className="text-xl text-gray-400">
+                  This product is currently unavailable
+                </p>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Product Info */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {product.category && (
+              <span className="text-purple-400 text-sm font-semibold uppercase mb-4 block">
+                {product.category}
+              </span>
+            )}
+
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {product.title}
+            </h1>
+
+            {product.is_featured && (
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-full mb-6">
+                <span className="font-semibold">Featured Product</span>
+              </div>
+            )}
+
+            {tierSystem && (tierSystem.basic?.price || tierSystem.standard?.price || tierSystem.premium?.price) ? (
+              <>
+                {/* Tier Selection */}
+                <Card className="mb-6">
+                  <h3 className="text-2xl font-bold mb-4">Choose Your Tier</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {['basic', 'standard', 'premium'].map((tier) => {
+                      if (!tierSystem[tier]?.price) return null;
+                      return (
+                        <button
+                          key={tier}
+                          onClick={() => setSelectedTier(tier)}
+                          className={`p-4 rounded-xl border-2 transition-all text-left ${
+                            selectedTier === tier
+                              ? 'border-purple-500 bg-purple-500/20'
+                              : 'border-white/10 bg-white/5 hover:border-purple-400'
                           }`}
-                          unoptimized={!normalizeImageUrl(product.image_url)?.startsWith('https://devbyzain-backend.vercel.app')}
-                        />
-                        
-                        {/* Image Navigation Dots */}
-                        {product.additional_images && JSON.parse(product.additional_images).length > 0 && (
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const additionalImages = JSON.parse(product.additional_images);
-                                const allImages = [product.image_url, ...additionalImages];
-                                const currentIndex = currentImageIndex[product.id] || 0;
-                                const newIndex = currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
-                                setCurrentImageIndex({ ...currentImageIndex, [product.id]: newIndex });
-                              }}
-                              className="bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm"
-                            >
-                              ‹
-                            </button>
-                            {[product.image_url, ...JSON.parse(product.additional_images)].map((_, idx) => (
-                              <button
-                                key={idx}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setCurrentImageIndex({ ...currentImageIndex, [product.id]: idx });
-                                }}
-                                className={`w-2 h-2 rounded-full transition-all ${
-                                  (currentImageIndex[product.id] || 0) === idx 
-                                    ? 'bg-white w-6' 
-                                    : 'bg-white/50'
-                                }`}
-                              />
-                            ))}
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const additionalImages = JSON.parse(product.additional_images);
-                                const allImages = [product.image_url, ...additionalImages];
-                                const currentIndex = currentImageIndex[product.id] || 0;
-                                const newIndex = (currentIndex + 1) % allImages.length;
-                                setCurrentImageIndex({ ...currentImageIndex, [product.id]: newIndex });
-                              }}
-                              className="bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm"
-                            >
-                              ›
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                        <span className="text-white text-4xl font-bold">
-                          {product.title.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Price Badge */}
-                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full">
-                      {(() => {
-                        try {
-                          const tierSystem = product.tier_system ? JSON.parse(product.tier_system) : null;
-                          const basicPrice = tierSystem?.basic?.price;
-                          if (basicPrice) {
-                            return (
-                              <span className="text-xl font-bold gradient-text">
-                                From Rs {basicPrice}
-                              </span>
-                            );
-                          }
-                        } catch (e) {
-                          console.error('Error parsing tier_system:', e);
-                        }
-                        return (
-                          <span className="text-2xl font-bold gradient-text">
-                            Rs {product.price}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    
-                    {product.is_featured && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        Featured
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="flex-1 flex flex-col">
-                    {product.category && (
-                      <span className="text-purple-400 text-sm font-semibold mb-2 uppercase">
-                        {product.category}
-                      </span>
-                    )}
-                    
-                    <h3 className="text-2xl font-bold mb-3">{product.title}</h3>
-                    
-                    <p className="text-gray-400 mb-6 flex-1">
-                      {product.description?.substring(0, 100)}
-                      {product.description?.length > 100 ? '...' : ''}
-                    </p>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-                      {product.preview_url && (
-                        <Button 
-                          variant="ghost" 
-                          icon={<FaExternalLinkAlt />}
-                          onClick={() => window.open(product.preview_url, '_blank')}
-                          className="flex-1"
                         >
-                          Preview
-                        </Button>
-                      )}
-                      <Link href={`/templates/${product.id}`} className="flex-1">
-                        <Button variant="primary" icon={<FaEye />} className="w-full">
-                          View Details
-                        </Button>
-                      </Link>
-                    </div>
+                          <h4 className="text-lg font-bold capitalize mb-2">{tier}</h4>
+                          <p className="text-3xl font-bold gradient-text mb-2">
+                            ${tierSystem[tier].price}
+                          </p>
+                          {tierSystem[tier].delivery_time && (
+                            <p className="text-sm text-gray-400">
+                              ⏱️ {tierSystem[tier].delivery_time}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+                  
+                  {/* Description moved here */}
+                  {tierSystem && selectedTier && tierSystem[selectedTier]?.description && (
+                    <p className="text-lg text-gray-300 mt-4 mb-2 leading-relaxed">
+                      {tierSystem[selectedTier].description}
+                    </p>
+                  )}
+                  
+                  {tierSystem[selectedTier]?.services && (
+                    <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                      <h4 className="font-semibold mb-2">What's Included:</h4>
+                      {Array.isArray(tierSystem[selectedTier].services) ? (
+                        <ul className="space-y-2">
+                          {tierSystem[selectedTier].services.map((service, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-gray-300">
+                              <span className="text-purple-400 mt-1">✓</span>
+                              <span>{service}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-300">{tierSystem[selectedTier].services}</p>
+                      )}
+                    </div>
+                  )}
                 </Card>
-              </motion.div>
-            ))}
-          </div>
-        )}
+              </>
+            ) : (
+              <div className="text-5xl font-bold gradient-text mb-6">
+                ${product.price}
+              </div>
+            )}
 
-        {/* CTA Section */}
+            {/* Features */}
+            {features.length > 0 && (
+              <Card className="mb-8">
+                <h3 className="text-2xl font-bold mb-4">Features</h3>
+                <ul className="space-y-3">
+                  {features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <FaCheck className="text-green-500 mt-1 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Related Products Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 glass-card p-12 text-center"
+          className="mt-20"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Don't See What You're Looking For?
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
+            You May Also <span className="gradient-text">Like</span>
           </h2>
-          <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-            We offer custom design services tailored to your specific needs and brand identity.
-          </p>
-          <Link href="/custom">
-            <Button variant="primary">Request Custom Design</Button>
-          </Link>
+          <div className="text-center">
+            <Link href="/templates">
+              <Button variant="secondary">View All Products</Button>
+            </Link>
+          </div>
         </motion.div>
       </div>
     </div>

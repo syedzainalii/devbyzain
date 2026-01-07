@@ -144,7 +144,7 @@ export default function ProductDetail() {
                 <Link href={`/order?product=${product.id}&type=purchase`} className="block">
                   <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/50">
                     <FaShoppingCart />
-                    Buy Now - Rs {tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
+                    Buy Now - ${tierSystem && tierSystem[selectedTier]?.price ? tierSystem[selectedTier].price : product.price}
                   </button>
                 </Link>
                 
@@ -206,7 +206,7 @@ export default function ProductDetail() {
                         >
                           <h4 className="text-lg font-bold capitalize mb-2">{tier}</h4>
                           <p className="text-3xl font-bold gradient-text mb-2">
-                            Rs {tierSystem[tier].price}
+                            ${tierSystem[tier].price}
                           </p>
                           {tierSystem[tier].delivery_time && (
                             <p className="text-sm text-gray-400">
@@ -217,6 +217,14 @@ export default function ProductDetail() {
                       );
                     })}
                   </div>
+                  
+                  {/* Description moved here */}
+                  {tierSystem && selectedTier && tierSystem[selectedTier]?.description && (
+                    <p className="text-lg text-gray-300 mt-4 mb-2 leading-relaxed">
+                      {tierSystem[selectedTier].description}
+                    </p>
+                  )}
+                  
                   {tierSystem[selectedTier]?.services && (
                     <div className="mt-4 p-4 bg-white/5 rounded-lg">
                       <h4 className="font-semibold mb-2">What's Included:</h4>
@@ -240,12 +248,6 @@ export default function ProductDetail() {
               <div className="text-5xl font-bold gradient-text mb-6">
                 ${product.price}
               </div>
-            )}
-
-            {tierSystem && selectedTier && tierSystem[selectedTier]?.description && (
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                {tierSystem[selectedTier].description}
-              </p>
             )}
 
             {/* Features */}

@@ -85,7 +85,7 @@ export default function Footer() {
             </div>
             <p className="text-sm text-gray-400">
               <a href="mailto:contact@devbyzain.com" className="hover:text-purple-400 transition-colors">
-                contact@devbyzain.com
+                +92 300 2678500
               </a>
             </p>
           </div>

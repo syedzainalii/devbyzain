@@ -9,8 +9,8 @@ import Input, { TextArea } from '@/components/Input';
 import Loading from '@/components/Loading';
 import { productAPI, uploadAPI } from '@/lib/api';
 import { isAuthenticated } from '@/lib/auth';
-import Image from 'next/image';
-import { normalizeImageUrl } from '@/lib/imageHelper';
+import OptimizedImage from '@/components/OptimizedImage';
+import { normalizeImageUrl, getCloudinaryPublicId } from '@/lib/imageHelper';
 
 export default function AdminProducts() {
   const router = useRouter();
@@ -319,7 +319,7 @@ export default function AdminProducts() {
                     </label>
                     {formData.image_url && (
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                        <Image src={normalizeImageUrl(formData.image_url)} alt="Preview" fill className="object-cover" unoptimized />
+                        <OptimizedImage src={formData.image_url} alt="Preview" fill className="object-cover" />
                       </div>
                     )}
                   </div>
@@ -352,7 +352,7 @@ export default function AdminProducts() {
                         {additionalImages.map((imgUrl, index) => (
                           <div key={index} className="relative group">
                             <div className="relative w-full h-20 rounded-lg overflow-hidden">
-                              <Image src={normalizeImageUrl(imgUrl)} alt={`Additional ${index + 1}`} fill className="object-cover" unoptimized />
+                              <OptimizedImage src={imgUrl} alt={`Additional ${index + 1}`} fill className="object-cover" />
                             </div>
                             <button
                               type="button"
@@ -539,7 +539,7 @@ export default function AdminProducts() {
             <Card key={product.id}>
               {product.image_url && (
                 <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-                  <Image src={normalizeImageUrl(product.image_url)} alt={product.title} fill className="object-cover" unoptimized />
+                  <OptimizedImage src={product.image_url} alt={product.title} fill className="object-cover" />
                 </div>
               )}
               

@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 import { FaShoppingCart, FaEdit, FaArrowLeft, FaCheck, FaExternalLinkAlt } from 'react-icons/fa';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
+import OptimizedImage from '@/components/OptimizedImage';
 import { productAPI } from '@/lib/api';
 
 export default function ProductDetail() {
@@ -91,7 +91,7 @@ export default function ProductDetail() {
             {/* Main Image */}
             <div className="relative w-full h-[500px] rounded-2xl overflow-hidden mb-4">
               {selectedImage ? (
-                <Image
+                <OptimizedImage
                   src={selectedImage}
                   alt={product.title}
                   fill
@@ -117,7 +117,7 @@ export default function ProductDetail() {
                       selectedImage === img ? 'border-purple-500 scale-105' : 'border-transparent'
                     }`}
                   >
-                    <Image
+                    <OptimizedImage
                       src={img}
                       alt={`Image ${index + 1}`}
                       fill

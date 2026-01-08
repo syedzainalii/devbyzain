@@ -10,6 +10,9 @@ import shutil
 from pathlib import Path
 import json
 from itsdangerous import URLSafeTimedSerializer
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -51,7 +54,15 @@ try:
 except Exception as e:
     print(f"Warning: Could not create tables on startup: {e}")
 
-# Create uploads directory (use /tmp for Vercel)
+# Initialize Cloudinary
+if settings.use_cloud_storage and settings.cloudinary_cloud_name:
+    cloudinary.config(
+        cloud_name=settings.cloudinary_cloud_name,
+        api_key=settings.cloudinary_api_key,
+        api_secret=settings.cloudinary_api_secret
+    )
+
+# Create uploads directory (use /tmp for Vercel) - kept for backwards compatibility
 upload_path = Path("/tmp") / settings.upload_dir if os.environ.get("VERCEL") else Path(settings.upload_dir)
 upload_path.mkdir(exist_ok=True, parents=True)
 
@@ -400,21 +411,39 @@ async def upload_file(
     file: UploadFile = File(...),
     current_admin: Admin = Depends(get_current_admin)
 ):
-    """Upload a file to the server"""
+    """Upload a file to Cloudinary or local server"""
     if file.size and file.size > settings.max_upload_size:
         raise HTTPException(status_code=400, detail="File too large")
     
-    # Create a unique filename
+    # If using Cloudinary
+    if settings.use_cloud_storage and settings.cloudinary_cloud_name:
+        try:
+            # Upload to Cloudinary
+            result = cloudinary.uploader.upload(
+                file.file,
+                folder="portfolio",
+                resource_type="auto",
+                public_id=f"{int(datetime.now().timestamp())}_{os.path.splitext(file.filename)[0]}"
+            )
+            
+            return {
+                "filename": result.get("public_id"),
+                "url": result.get("secure_url"),
+                "size": result.get("bytes"),
+                "cloudinary_id": result.get("public_id")
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to upload to Cloudinary: {str(e)}")
+    
+    # Fallback to local/tmp storage
     file_extension = os.path.splitext(file.filename)[1]
     unique_filename = f"{int(datetime.now().timestamp())}_{file.filename}"
     file_path = upload_path / unique_filename
     
-    # Save file
+    # Save file locally
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # For Vercel, return backend API URL to serve files
-    # For local, return static file URL
     backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
     
     return {
@@ -429,7 +458,18 @@ async def delete_file(
     filename: str,
     current_admin: Admin = Depends(get_current_admin)
 ):
-    """Delete an uploaded file"""
+    """Delete an uploaded file from Cloudinary or local storage"""
+    # If using Cloudinary, try to delete from there
+    if settings.use_cloud_storage and settings.cloudinary_cloud_name:
+        try:
+            # If filename looks like a Cloudinary public_id (contains folder path)
+            if "/" in filename or "portfolio" in filename:
+                cloudinary.uploader.destroy(filename)
+                return {"message": "File deleted from Cloudinary successfully"}
+        except Exception as e:
+            print(f"Error deleting from Cloudinary: {str(e)}")
+    
+    # Fallback to local storage deletion
     file_path = upload_path / filename
     if file_path.exists():
         file_path.unlink()

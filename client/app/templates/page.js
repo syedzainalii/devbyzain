@@ -1,13 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 import { FaFilter } from 'react-icons/fa';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
+import OptimizedImage from '@/components/OptimizedImage';
 import { productAPI } from '@/lib/api';
-import { normalizeImageUrl } from '@/lib/imageHelper';
 
 export default function Templates() {
   const [products, setProducts] = useState([]);
@@ -105,12 +104,11 @@ export default function Templates() {
                     {/* Product Image */}
                     <div className="relative w-full h-64 mb-6 rounded-xl overflow-hidden">
                       {product.image_url ? (
-                        <Image
-                          src={normalizeImageUrl(product.image_url)}
+                        <OptimizedImage
+                          src={product.image_url}
                           alt={product.title}
                           fill
                           className="object-cover transition-transform duration-300 group-hover:scale-110"
-                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">

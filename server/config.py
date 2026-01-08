@@ -15,9 +15,16 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440  # 24 hours
     
-    # Upload
+    # Upload (legacy - keeping for backwards compatibility)
     upload_dir: str = "uploads"
     max_upload_size: int = 10485760  # 10MB
+    
+    # Cloudinary Configuration
+    cloudinary_cloud_name: str = ""
+    cloudinary_api_key: str = ""
+    cloudinary_api_secret: str = ""
+    cloudinary_url: str = ""
+    use_cloud_storage: bool = True
     
     # Email Configuration
     mail_username: str = ""

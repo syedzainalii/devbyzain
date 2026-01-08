@@ -1,6 +1,7 @@
 /**
- * Helper function to normalize image URLs for both old and new formats
+ * Helper function to normalize image URLs for Cloudinary and legacy formats
  * Handles:
+ * - Cloudinary URLs: https://res.cloudinary.com/...
  * - Old format: /uploads/filename.png
  * - New format: https://backend-url/api/files/filename.png
  * - Absolute URLs
@@ -9,11 +10,12 @@ export function normalizeImageUrl(imageUrl) {
   if (!imageUrl) return null;
 
   // If it's already an absolute URL (http:// or https://), return as is
+  // This includes Cloudinary URLs
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
 
-  // Determine the API URL based on environment
+  // Determine the API URL based on environment (for legacy file serving)
   let apiUrl;
   
   // Priority 1: Use environment variable if set
@@ -47,6 +49,30 @@ export function normalizeImageUrl(imageUrl) {
 
   // Default: return as is
   return imageUrl;
+}
+
+/**
+ * Extract Cloudinary public ID from a full URL
+ * Example: https://res.cloudinary.com/cloud/image/upload/v123/portfolio/image.jpg -> portfolio/image
+ */
+export function getCloudinaryPublicId(url) {
+  if (!url) return null;
+  
+  // If it's a Cloudinary URL, extract the public ID
+  if (url.includes('res.cloudinary.com')) {
+    const parts = url.split('/upload/');
+    if (parts.length > 1) {
+      // Remove version and extension
+      const pathParts = parts[1].split('/');
+      // Skip version (v123456) if present
+      const startIndex = pathParts[0].startsWith('v') ? 1 : 0;
+      const publicIdWithExt = pathParts.slice(startIndex).join('/');
+      // Remove file extension
+      return publicIdWithExt.replace(/\.[^/.]+$/, '');
+    }
+  }
+  
+  return url;
 }
 
 // Helper to handle image load errors

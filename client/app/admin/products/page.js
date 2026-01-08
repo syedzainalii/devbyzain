@@ -67,11 +67,13 @@ export default function AdminProducts() {
 
     setUploading(true);
     try {
+      // Upload directly to Cloudinary (much faster!)
       const response = await uploadAPI.upload(file);
       setFormData({ ...formData, image_url: response.data.url });
+      console.log('✅ Image uploaded to Cloudinary:', response.data.url);
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Failed to upload file');
+      alert('Failed to upload file. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -83,13 +85,16 @@ export default function AdminProducts() {
 
     setUploading(true);
     try {
+      console.log(`📤 Uploading ${files.length} images directly to Cloudinary...`);
+      // Upload all files in parallel to Cloudinary
       const uploadPromises = files.map(file => uploadAPI.upload(file));
       const responses = await Promise.all(uploadPromises);
       const newImageUrls = responses.map(res => res.data.url);
       setAdditionalImages([...additionalImages, ...newImageUrls]);
+      console.log(`✅ All ${files.length} images uploaded successfully!`);
     } catch (error) {
       console.error('Error uploading files:', error);
-      alert('Failed to upload some files');
+      alert('Failed to upload some files. Please try again.');
     } finally {
       setUploading(false);
     }

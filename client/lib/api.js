@@ -84,7 +84,23 @@ export const contentAPI = {
 
 // File Upload APIs
 export const uploadAPI = {
-  upload: (file) => {
+  upload: async (file, useCloudinary = true) => {
+    // Try direct Cloudinary upload first if enabled
+    if (useCloudinary && process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+      try {
+        const { uploadToCloudinary } = await import('./cloudinaryUpload');
+        const result = await uploadToCloudinary(file, {
+          folder: 'portfolio',
+          tags: ['portfolio', 'product']
+        });
+        return { data: result };
+      } catch (error) {
+        console.warn('Cloudinary upload failed, falling back to backend:', error);
+        // Fall through to backend upload
+      }
+    }
+    
+    // Fallback to backend upload
     const formData = new FormData();
     formData.append('file', file);
     return api.post('/api/upload', formData, {

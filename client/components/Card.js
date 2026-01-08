@@ -14,7 +14,8 @@ export default function Card({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className={`${hover ? 'glass-card-hover' : 'glass-card'} p-6 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      whileTap={onClick ? { scale: 0.98 } : {}}
+      className={`${hover ? 'glass-card-hover' : 'glass-card'} p-4 sm:p-5 md:p-6 ${onClick ? 'cursor-pointer active:scale-95' : ''} ${className}`}
       onClick={onClick}
     >
       {children}

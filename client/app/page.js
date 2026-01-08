@@ -30,24 +30,24 @@ export default function Home() {
       />
 
       {/* Hero Section - Immersive 3D */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-16 sm:pt-20">
         {/* Animated Grid Background */}
         <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
         
-        {/* 3D Floating Elements */}
+        {/* 3D Floating Elements - Optimized for mobile */}
         <motion.div 
           style={{ y }}
           className="absolute inset-0"
         >
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-float-delayed"></div>
-          <div className="absolute bottom-1/4 left-1/2 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-float-slow"></div>
+          <div className="absolute top-1/4 left-1/4 w-40 h-40 sm:w-64 sm:h-64 bg-purple-500/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute top-1/3 right-1/4 w-56 h-56 sm:w-96 sm:h-96 bg-indigo-500/20 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute bottom-1/4 left-1/2 w-48 h-48 sm:w-80 sm:h-80 bg-pink-500/20 rounded-full blur-3xl animate-float-slow"></div>
         </motion.div>
 
-        <div className="container-custom relative z-10 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-12 sm:py-20">
           <div className="max-w-7xl mx-auto">
             {/* Innovative Split Layout */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
               {/* Left: Content */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -58,19 +58,19 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-3 px-5 py-3 rounded-full bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 backdrop-blur-xl mb-8"
+                  className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 rounded-full bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 backdrop-blur-xl mb-6 sm:mb-8"
                 >
-                  <div className="relative flex h-3 w-3">
+                  <div className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-purple-500"></span>
                   </div>
-                  <span className="text-sm font-semibold bg-gradient-to-r from-purple-400 to-indigo-400 text-transparent bg-clip-text">
+                  <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-purple-400 to-indigo-400 text-transparent bg-clip-text">
                     Next-Gen Web Design Platform
                   </span>
                 </motion.div>
 
                 <motion.h1 
-                  className="text-6xl md:text-8xl font-black mb-8 leading-[0.95]"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 sm:mb-8 leading-[0.95]"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -83,7 +83,7 @@ export default function Home() {
                 </motion.h1>
                 
                 <motion.p 
-                  className="text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-2xl"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -92,24 +92,24 @@ export default function Home() {
                 </motion.p>
 
                 <motion.div 
-                  className="flex flex-wrap gap-4 mb-12"
+                  className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-8 sm:mb-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
                 >
-                  <Link href="/templates">
-                    <button className="group relative px-8 py-5 bg-white text-slate-900 rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/80 transition-all duration-300">
+                  <Link href="/templates" className="w-full sm:w-auto">
+                    <button className="group relative w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-5 bg-white text-slate-900 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg overflow-hidden shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/80 active:scale-95 transition-all duration-300">
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">
-                        <FaShoppingCart className="group-hover:rotate-12 transition-transform" />
+                      <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3 group-hover:text-white transition-colors">
+                        <FaShoppingCart className="group-hover:rotate-12 transition-transform text-base sm:text-lg" />
                         Explore Templates
-                        <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
+                        <FaArrowRight className="group-hover:translate-x-2 transition-transform text-sm sm:text-base" />
                       </span>
                     </button>
                   </Link>
-                  <Link href="/custom">
-                    <button className="px-8 py-5 bg-white/5 border-2 border-white/20 backdrop-blur-xl rounded-2xl font-bold text-lg flex items-center gap-3 hover:bg-white/10 hover:border-white/40 hover:scale-105 transition-all duration-300">
-                      <FaPlay className="text-purple-400" />
+                  <Link href="/custom" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-5 bg-white/5 border-2 border-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 sm:gap-3 hover:bg-white/10 hover:border-white/40 active:scale-95 transition-all duration-300">
+                      <FaPlay className="text-purple-400 text-base sm:text-lg" />
                       Custom Design
                     </button>
                   </Link>
@@ -120,19 +120,19 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
-                  className="flex gap-8 text-sm"
+                  className="flex flex-wrap gap-6 sm:gap-8 text-sm"
                 >
                   <div>
-                    <div className="text-3xl font-bold gradient-text mb-1">50+</div>
-                    <div className="text-gray-500">Templates</div>
+                    <div className="text-2xl sm:text-3xl font-bold gradient-text mb-1">50+</div>
+                    <div className="text-gray-500 text-xs sm:text-sm">Templates</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold gradient-text mb-1">500+</div>
-                    <div className="text-gray-500">Happy Clients</div>
+                    <div className="text-2xl sm:text-3xl font-bold gradient-text mb-1">500+</div>
+                    <div className="text-gray-500 text-xs sm:text-sm">Happy Clients</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold gradient-text mb-1">4.9★</div>
-                    <div className="text-gray-500">Rating</div>
+                    <div className="text-2xl sm:text-3xl font-bold gradient-text mb-1">4.9★</div>
+                    <div className="text-gray-500 text-xs sm:text-sm">Rating</div>
                   </div>
                 </motion.div>
               </motion.div>
@@ -206,15 +206,15 @@ export default function Home() {
       </section>
 
       {/* Horizontal Scrolling Templates Showcase */}
-      <section className="py-24 bg-gradient-to-b from-transparent to-purple-900/25 overflow-hidden">
-        <div className="container-custom mb-12">
+      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-b from-transparent to-purple-900/25 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center"
           >
-            <h2 className="text-5xl md:text-6xl font-black mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4">
               Browse <span className="gradient-text">Templates</span>
             </h2>
             <p className="text-xl text-gray-400">Swipe to explore our collection</p>
@@ -257,15 +257,15 @@ export default function Home() {
       </section>
 
       {/* Interactive Service Cards */}
-      <section className="section-padding">
-        <div className="container-custom">
+      <section className="py-12 sm:py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-black mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Two Ways to <span className="gradient-text">Win</span>
             </h2>
           </motion.div>
@@ -382,7 +382,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Marquee */}
-      <section className="py-24 bg-gradient-to-b from-transparent to-purple-900/10 overflow-hidden">
+      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-b from-transparent to-purple-900/10 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

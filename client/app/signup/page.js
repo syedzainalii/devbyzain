@@ -76,8 +76,8 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center section-padding">
-      <div className="container-custom">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -85,8 +85,8 @@ export default function SignUp() {
             transition={{ duration: 0.5 }}
           >
             {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
                 Create Account
               </h1>
               <p className="text-xl text-gray-400">

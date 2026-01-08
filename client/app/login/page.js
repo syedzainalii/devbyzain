@@ -58,8 +58,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center section-padding">
-      <div className="container-custom">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -67,26 +67,26 @@ export default function Login() {
             transition={{ duration: 0.5 }}
           >
             {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
                 Welcome Back
               </h1>
-              <p className="text-xl text-gray-400">
+              <p className="text-base sm:text-lg md:text-xl text-gray-400">
                 Login to your account to continue
               </p>
             </div>
 
             {/* Login Form */}
             <Card>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-red-400">
+                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 sm:p-4 text-sm sm:text-base text-red-400">
                     {error}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-gray-300">
+                  <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-300">
                     Email Address
                   </label>
                   <Input
@@ -101,7 +101,7 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-gray-300">
+                  <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-300">
                     Password
                   </label>
                   <Input
@@ -115,15 +115,15 @@ export default function Login() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       className="w-4 h-4 rounded border-gray-600 bg-white/5 text-purple-500 focus:ring-purple-500"
                     />
-                    <span className="text-sm text-gray-400">Remember me</span>
+                    <span className="text-xs sm:text-sm text-gray-400">Remember me</span>
                   </label>
-                  <Link href="/forgot-password" className="text-sm text-purple-400 hover:text-purple-300">
+                  <Link href="/forgot-password" className="text-xs sm:text-sm text-purple-400 hover:text-purple-300">
                     Forgot Password?
                   </Link>
                 </div>

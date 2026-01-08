@@ -27,6 +27,20 @@
     background-attachment: fixed;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile-specific optimizations */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Better touch targets and performance for mobile */
+  button, a, input, textarea, select {
+    touch-action: manipulation;
   }
 
   h1, h2, h3, h4, h5, h6 {

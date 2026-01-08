@@ -64,18 +64,18 @@ export default function Navbar() {
         ? 'bg-slate-950/95 backdrop-blur-xl border-b border-white/10 shadow-2xl' 
         : 'bg-transparent'
     }`}>
-      <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-3 cursor-pointer"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <span className="text-white font-black text-2xl">D</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <span className="text-white font-black text-xl sm:text-2xl">D</span>
               </div>
-              <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+              <h1 className="text-lg sm:text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
                 DevbyZain
               </h1>
             </motion.div>
@@ -213,11 +213,12 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="lg:hidden text-white text-2xl"
+            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors active:bg-white/20"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.9 }}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? <FaTimes /> : <FaBars />}
+            {isOpen ? <FaTimes className="text-2xl" /> : <FaBars className="text-2xl" />}
           </motion.button>
         </div>
 
@@ -228,9 +229,9 @@ export default function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden overflow-hidden border-t border-white/10"
+              className="lg:hidden overflow-hidden border-t border-white/10 bg-slate-950/50 backdrop-blur-xl"
             >
-              <div className="py-4 space-y-2">
+              <div className="py-4 space-y-1">
                 {navLinks.map((link) => (
                   <Link key={link.name} href={link.href}>
                     <motion.div

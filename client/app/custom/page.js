@@ -136,10 +136,10 @@ export default function Services() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
               {pageContent.hero_title}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-8">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
               {pageContent.hero_description}
             </p>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
@@ -158,7 +158,7 @@ export default function Services() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Start Your Project
             </h2>
             <p className="text-xl text-gray-400">
@@ -244,7 +244,7 @@ export default function Services() {
               {/* Package Selection */}
               <div>
                 <h3 className="text-2xl font-bold mb-4 text-purple-400">Choose Your Package</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   {['basic', 'standard', 'premium'].map((tier) => (
                     <button
                       key={tier}
@@ -409,14 +409,14 @@ export default function Services() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {pageContent.features.map((feature, index) => (
               <Card key={index} delay={index * 0.1}>
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mb-6 text-3xl">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6 text-2xl sm:text-3xl">
                   {getIcon(feature.icon)}
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                <p className="text-gray-400 text-lg">{feature.description}</p>
+                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{feature.title}</h3>
+                <p className="text-gray-400 text-sm sm:text-base md:text-lg">{feature.description}</p>
               </Card>
             ))}
           </div>

@@ -5,7 +5,7 @@
  */
 
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // Cloudinary's default unsigned preset
+const CLOUDINARY_UPLOAD_PRESET = 'portfolio_unsigned'; // Your custom unsigned preset
 
 /**
  * Upload a single file directly to Cloudinary
